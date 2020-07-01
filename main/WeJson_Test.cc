@@ -50,6 +50,7 @@ bool test_parse_number(double val, string str_val)
     }
 
     fprintf(stdout, "double: %lf, str_double: %s, read_double: %s\n", val, str_val.c_str(), json_number.generate().c_str());
+    return false;
 }
 
 TEST_F(WeJson_Test, NUMBER_TEST)

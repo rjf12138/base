@@ -28,9 +28,7 @@ WeJson::open_json(string json_file_path)
     }
 
     ByteBuffer raw_json_buffer;
-    struct stat file_info;
-    off_t file_size = json_file.fileinfo(file_info);
-    json_file.read(raw_json_buffer, file_info.st_size);
+    json_file.read(raw_json_buffer, json_file.file_size());
     this->parser_from_json(raw_json_buffer);
 
     return 0;

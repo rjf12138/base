@@ -19,6 +19,7 @@ public:
     int set_fd(int fd, bool open_when_exit = true);
 
     int fileinfo(struct stat &file_info);
+    off_t file_size() {return file_info_.st_size;}
     int close_file(void);
     int check_fd(int fd);
     void print_errno(void);

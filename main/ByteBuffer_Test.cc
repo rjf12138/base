@@ -34,10 +34,11 @@ struct test_stru {
 class TestWriteThread : public Thread {
 public:
     TestWriteThread(ByteBuffer &buff, int test_cnt, int thread_cnt)
-        : buff_(buff), test_cnt_(test_cnt), thread_cnt_(thread_cnt) {}
+        :  test_cnt_(test_cnt), thread_cnt_(thread_cnt), buff_(buff) {}
     
     int set_type(int type) {
         type_ = type;
+        return 0;
     }
 
     int run_handler(void) {
@@ -111,6 +112,7 @@ public:
             
             this->stop_handler();
         }
+        return 0;
     }
     bool test_write_data(void) {
         for (int i = 0; i < test_cnt_ * thread_cnt_; ++i) {
@@ -189,9 +191,11 @@ public:
 
     int stop_handler(void) {
         exit_ = true;
+        return 0;
     }
     int start_handler(void) {
         exit_ = false;
+        return 0;
     }
 
 private:
@@ -403,7 +407,7 @@ TEST_F(ByteBuffer_Test, copy_test)
     ByteBuffer src, dest;
     int start_size = 1000, end_size = 10000;
     for (int i = start_size;i < end_size; i += 100) {
-        for (int j = 0;i < i; ++j) {
+        for (int j = 0;j < i; ++j) {
             src.write_int8(j % 256);
         }
         dest = src;

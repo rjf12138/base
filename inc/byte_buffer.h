@@ -19,12 +19,12 @@ public:
     ByteBuffer(BUFSIZE_T max_buffer_size = 2);
     virtual ~ByteBuffer();
 
-    int read_only_int8(int8_t &val) {}
-    int read_only_int16(int16_t &val) {}
-    int read_only_int32(int32_t &val) {}
-    int read_only_int64(int64_t &val) {}
-    int read_only_string(string &str) {}
-    BUFSIZE_T read_only_bytes(void *buf, BUFSIZE_T buf_size, bool match = false) {}
+    int read_only_int8(int8_t &val) {return 0;}
+    int read_only_int16(int16_t &val) {return 0;}
+    int read_only_int32(int32_t &val) {return 0;}
+    int read_only_int64(int64_t &val) {return 0;}
+    int read_only_string(string &str) {return 0;}
+    BUFSIZE_T read_only_bytes(void *buf, BUFSIZE_T buf_size, bool match = false) {return 0;}
 
     int read_int8(int8_t &val);
     int read_int16(int16_t &val);

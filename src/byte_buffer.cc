@@ -190,7 +190,8 @@ int ByteBuffer::read_string(string &str, BUFSIZE_T str_size)
     if (str_size == -1) {
         str_size = this->data_size();
     }
-    int read_size = str_size > str.max_size() ? str.max_size() - 1  : str_size;
+    BUFSIZE_T max_str_size = str.max_size();
+    int read_size = str_size > max_str_size ? max_str_size - 1  : str_size;
     char *str_ptr = new char[read_size + 1];
     BUFSIZE_T ret =  this->copy_data_from_buffer(str_ptr, read_size);
     if (ret == -1) {
@@ -235,10 +236,6 @@ int ByteBuffer::write_int64(int64_t val)
 
 int ByteBuffer::write_string(string &str, BUFSIZE_T str_size)
 {
-    BUFSIZE_T write_size = 0;
-    if (str_size == -1) {
-        write_size = str.length();
-    }
     return this->copy_data_to_buffer(str.c_str(), str.length());
 }
 

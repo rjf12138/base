@@ -75,23 +75,32 @@ JsonType::debug_info(ByteBuffer_Iterator &value_curr_pos)
 ///////////////////////////////////////////////////////////
 
 JsonNumber::JsonNumber(void)
-: int_value_(0), double_value_(0), value_type_(NONE_TYPE)
+: value_type_(NONE_TYPE),
+  double_value_(0),
+  int_value_(0)
+  
 {
 
 }
 JsonNumber::JsonNumber(double val)
-: value_type_(DOUBLE_TYPE), double_value_(val)
+: value_type_(DOUBLE_TYPE), 
+  double_value_(val),
+  int_value_(0)
 {
     std::cout << "constru: " << double_value_ << " param_val: " << val << std::endl;
 }
 JsonNumber::JsonNumber(int32_t val)
-: value_type_(INT32_TYPE), int_value_(val)
+: value_type_(INT32_TYPE), 
+  double_value_(0),
+  int_value_(val)
 {
 
 }
 
 JsonNumber::JsonNumber(const JsonNumber& val)
-: value_type_(val.value_type_), int_value_(val.int_value_), double_value_(val.double_value_)
+: value_type_(val.value_type_), 
+  double_value_(val.double_value_),
+  int_value_(val.int_value_)
 {
 
 }
@@ -357,6 +366,8 @@ JsonNull&
 JsonNull::operator=(JsonNull rhs)
 {
     value_ = rhs.value_;
+
+    return *this;
 }
 
 
@@ -682,7 +693,7 @@ JsonArray::generate(string ctrl_ch)
 {
     ostringstream ostr;
     ostr << "[";
-    for (int i = 0; i < array_val_.size(); ++i) {
+    for (std::size_t i = 0; i < array_val_.size(); ++i) {
         if (i != 0) { // 每输出一个类型后跟一个','
             ostr << ",\n" << ctrl_ch;
         } else {
@@ -721,7 +732,7 @@ JsonArray::operator==(const JsonArray& rhs) const
         return false;
     }
 
-    for (int i = 0; i > array_val_.size(); ++i) {
+    for (std::size_t i = 0; i > array_val_.size(); ++i) {
         if (array_val_[i].json_array_value_ != rhs.array_val_[i].json_array_value_) {
             return false;
         }
@@ -753,28 +764,28 @@ ValueTypeCast::ValueTypeCast(JsonBool value)
     : json_value_type_(JSON_BOOL_TYPE), json_bool_value_(value) {}
     
 ValueTypeCast::ValueTypeCast(JsonNumber value)
-    : json_number_value_(value), json_value_type_(JSON_NUMBER_TYPE) {}
+    : json_value_type_(JSON_NUMBER_TYPE), json_number_value_(value) {}
 
 ValueTypeCast::ValueTypeCast(JsonString value)
-    : json_string_value_(value), json_value_type_(JSON_STRING_TYPE) {}
+    : json_value_type_(JSON_STRING_TYPE), json_string_value_(value) {}
 
 ValueTypeCast::ValueTypeCast(JsonObject value)
-    :json_object_value_(value), json_value_type_(JSON_OBJECT_TYPE) {}
+    : json_value_type_(JSON_OBJECT_TYPE), json_object_value_(value) {}
 
 ValueTypeCast::ValueTypeCast(JsonArray value)
-    : json_array_value_(value), json_value_type_(JSON_ARRAY_TYPE) {}
+    : json_value_type_(JSON_ARRAY_TYPE), json_array_value_(value) {}
 
 ValueTypeCast::ValueTypeCast(JsonNull value)
-    : json_null_value_(value), json_value_type_(JSON_NULL_TYPE) {}
+    : json_value_type_(JSON_NULL_TYPE), json_null_value_(value) {}
 
 ValueTypeCast::ValueTypeCast(const ValueTypeCast &value)
     : json_value_type_(value.json_value_type_),
       json_array_value_(value.json_array_value_),
-      json_bool_value_(value.json_bool_value_),
-      json_null_value_(value.json_null_value_),
-      json_number_value_(value.json_number_value_),
+      json_object_value_(value.json_object_value_),
       json_string_value_(value.json_string_value_),
-      json_object_value_(value.json_object_value_)
+      json_number_value_(value.json_number_value_),
+      json_bool_value_(value.json_bool_value_),
+      json_null_value_(value.json_null_value_)
 {}
 
 ValueTypeCast::~ValueTypeCast(void) {}

@@ -27,9 +27,9 @@ public:
     // 检查当前位置的字符来判断接下来的是什么类型，具体参考doc中的资料
     static VALUE_TYPE check_value_type(ByteBuffer_Iterator &iter);
     // 解析遇到的类型，具体取决于check_value_type()返回的类型和继承该类的实现
-    virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos){}
+    virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos){return ByteBuffer_Iterator();}
     // 将当前类型以字符串方式输出，ctrl_ch控制输出的格式，为了方便阅读
-    virtual string generate(string ctrl_ch = "\0") {};
+    virtual string generate(string ctrl_ch = "\0") { return "";};
     // 获取以value_curr_pos为中心，range为半径范围的json值，主要为了调试用
     string get_json_text(ByteBuffer_Iterator &value_curr_pos, int range);
     // 输出调试信息

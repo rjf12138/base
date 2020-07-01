@@ -17,5 +17,5 @@ Process::create_process(void *child_arg, void *parent_arg)
 int 
 Process::wait_child_process(void)
 {
-    ::wait(NULL);
+    return ::wait(NULL);
 }

@@ -6,12 +6,16 @@ namespace my_util {
 int output_to_stdout(const string &msg)
 {
     std::cout << msg;
+
+    return 0;
 }
 
 // 默认标准出错函数
 int output_to_stderr(const string &msg)
 {
     std::cerr << msg;
+
+    return 0;
 }
 //////////////////////////////////////////////
 
@@ -91,7 +95,7 @@ string
 MsgRecord::assemble_msg(void)
 {
     ostringstream ostr;
-    for (int i = 0; i < msg_info_.size(); ++i) {
+    for (std::size_t i = 0; i < msg_info_.size(); ++i) {
         ostr << "[" << msg_info_[i].when << "]";
         ostr << "[" << msg_info_[i].which_line << "]";
         ostr << "[" << msg_info_[i].which_file << "] ";

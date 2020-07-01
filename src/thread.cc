@@ -12,6 +12,8 @@ Thread::create_func(void* arg)
 
     Thread *self = (Thread*)arg;
     self->run_handler();
+
+    return arg;
 }
 
 int 
@@ -21,9 +23,9 @@ Thread::init(void)
     return pthread_create(&thread_id_, NULL, create_func, (void*)this);
 }
 
-int Thread::run_handler(void) { }
-int Thread::stop_handler(void) { }
-int Thread::start_handler(void) { }
+int Thread::run_handler(void) { return 0;}
+int Thread::stop_handler(void) {return 0; }
+int Thread::start_handler(void) {return 0; }
 
 int Thread::wait_thread(void)
 {

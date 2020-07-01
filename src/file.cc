@@ -90,6 +90,8 @@ FileOperate::close_file(void)
         file_open_flag_ = false;
         close(fd_);
     }
+
+    return 0;
 }
 
 int 
@@ -185,7 +187,7 @@ FileOperate::write(ByteBuffer &buff, size_t buf_size)
         size_t read_size = remain_size > 8192 ? tmp_buf_size : remain_size;
         size_t ret_read_size = buff.read_bytes(buf, read_size);
 
-        size_t ret = ::write(fd_, buf, ret_read_size);
+        int ret = ::write(fd_, buf, ret_read_size);
         if (ret == -1) {
             fprintf(stderr, "write: %s\n", strerror(errno));
             return ret;
