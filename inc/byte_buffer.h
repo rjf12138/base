@@ -4,12 +4,13 @@
 #include "basic_head.h"
 #include "mutex.h"
 
+namespace my_util {
+
 #define MAX_STRING_SIZE     512
 #define MAX_BUFFER_SIZE     1*1024*1024*1024
 
-namespace my_util {
-
 typedef int64_t BUFSIZE_T;
+typedef uint64_t UNBUFSIZE_T;
 typedef vector<int8_t> BUFFTYPE_T;
 
 class ByteBuffer_Iterator;

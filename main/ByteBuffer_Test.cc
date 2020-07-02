@@ -262,10 +262,10 @@ TEST_F(ByteBuffer_Test, ByteBuff_none_lock_read_write)
     string str = "Hello, world";
     for (int i = 0; i < test_cnt; ++i) {
         ASSERT_EQ(buff.data_size(), 0);
-        ASSERT_EQ(buff.write_string(str), str.length());
-        ASSERT_EQ(buff.data_size(), str.length());
+        ASSERT_EQ((std::size_t)buff.write_string(str), str.length());
+        ASSERT_EQ((std::size_t)buff.data_size(), str.length());
         string val_str;
-        EXPECT_EQ(buff.read_string(val_str), str.length());
+        EXPECT_EQ((std::size_t)buff.read_string(val_str), str.length());
         ASSERT_EQ(buff.data_size(), 0);
         ASSERT_EQ(val_str, str);
     }
@@ -273,10 +273,10 @@ TEST_F(ByteBuffer_Test, ByteBuff_none_lock_read_write)
     struct test_stru stru = {'b', 12345, "Nice to meet you", "hello"};
     for (int i = 0; i < test_cnt; ++i) {
         ASSERT_EQ(buff.data_size(), 0);
-        ASSERT_EQ(buff.write_bytes((void*)&stru, sizeof(stru)) , sizeof(stru));
-        ASSERT_EQ(buff.data_size(), sizeof(stru));
+        ASSERT_EQ((std::size_t)buff.write_bytes((void*)&stru, sizeof(stru)) , sizeof(stru));
+        ASSERT_EQ((std::size_t)buff.data_size(), sizeof(stru));
         struct test_stru val_stru;
-        ASSERT_EQ(buff.read_bytes(&val_stru, sizeof(stru)), sizeof(stru));
+        ASSERT_EQ((std::size_t)buff.read_bytes(&val_stru, sizeof(stru)), sizeof(stru));
         ASSERT_EQ(buff.data_size(), 0);
         ASSERT_EQ(val_stru.i8, stru.i8);
         ASSERT_EQ(val_stru.i16, stru.i16);
@@ -394,7 +394,7 @@ TEST_F(ByteBuffer_Test, boundary_test)
 
     test_stru test;
     buff.write_bytes((void*)&test, sizeof(test));
-    ASSERT_EQ(buff.data_size(), sizeof(test));
+    ASSERT_EQ((std::size_t)buff.data_size(), sizeof(test));
     ASSERT_EQ(buff.empty(), false);
     
     buff.clear();
