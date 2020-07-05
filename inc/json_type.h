@@ -28,8 +28,10 @@ public:
     static VALUE_TYPE check_value_type(ByteBuffer_Iterator &iter);
     // 解析遇到的类型，具体取决于check_value_type()返回的类型和继承该类的实现
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos){return ByteBuffer_Iterator();}
-    // 将当前类型以字符串方式输出，ctrl_ch控制输出的格式，为了方便阅读
-    virtual string generate(string ctrl_ch = "\0") { return "";};
+    // 将json值反序列化为字符串输出， 没有格式化
+    virtual string generate(void) { return "";}
+    // 格式化json字符串，方便阅读
+    virtual string format_json(void);
     // 获取以value_curr_pos为中心，range为半径范围的json值，主要为了调试用
     string get_json_text(ByteBuffer_Iterator &value_curr_pos, int range);
     // 输出调试信息
@@ -49,7 +51,7 @@ public:
     ~JsonNumber(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
-    virtual string generate(string ctrl_ch = "\0") override;
+    virtual string generate(void) override;
 
     bool operator==(const JsonNumber& rhs) const;
     bool operator!=(const JsonNumber& rhs) const;
@@ -70,7 +72,7 @@ public:
     ~JsonBool(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
-    virtual string generate(string ctrl_ch = "\0") override;
+    virtual string generate(void) override;
 
     bool operator==(const JsonBool& rhs) const;
     bool operator!=(const JsonBool& rhs) const;
@@ -89,7 +91,7 @@ public:
     ~JsonNull(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
-    virtual string generate(string ctrl_ch = "\0") override;
+    virtual string generate(void) override;
 
     bool operator==(const JsonNull& rhs) const;
     bool operator!=(const JsonNull& rhs) const;
@@ -108,7 +110,7 @@ public:
     ~JsonString(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
-    virtual string generate(string ctrl_ch = "\0") override;
+    virtual string generate(void) override;
 
     bool operator==(const JsonString& rhs) const;
     bool operator!=(const JsonString& rhs) const;
@@ -127,7 +129,7 @@ public:
     ~JsonObject(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
-    virtual string generate(string ctrl_ch = "\0") override;
+    virtual string generate(void) override;
 
     bool operator==(const JsonObject& rhs) const;
     bool operator!=(const JsonObject& rhs) const;
@@ -146,7 +148,7 @@ public:
     ~JsonArray(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
-    virtual string generate(string ctrl_ch = "\0") override;
+    virtual string generate(void) override;
 
     ValueTypeCast& operator[](size_t key);
     const ValueTypeCast& operator[](const size_t key) const;
@@ -190,7 +192,7 @@ public:
     bool operator==(const ValueTypeCast& rhs) const;
     bool operator!=(const ValueTypeCast& rhs) const;
 
-    string generate(string ctrl_ch = "\0");
+    virtual string generate(void);
 
 public:
     VALUE_TYPE json_value_type_;

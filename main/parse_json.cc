@@ -14,7 +14,9 @@ int main(int argc, char *argv[])
 
     WeJson js;
     js.open_json(file_path);
+    // cout << js.generate_to_json() << endl;
     cout  << js[json_key];
+    
 
     return 0;
 }

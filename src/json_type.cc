@@ -66,6 +66,51 @@ JsonType::get_json_text(ByteBuffer_Iterator &value_curr_pos, int range)
     return ostr.str();
 }
 
+string 
+JsonType::format_json(void)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE || json_value_type_ == JSON_ARRAY_TYPE){
+        string raw_json = this->generate();
+
+        int tab = 0;
+        ostringstream oformat_json;
+        for (std::size_t i = 0; i < raw_json.size(); ++i) {
+            if (raw_json[i] == '{' || raw_json[i] == '[') {
+                ++tab;
+                oformat_json << raw_json[i];
+                oformat_json << '\n';
+                for (int j = 0; j < tab; ++j) {
+                    oformat_json << '\t';
+                }
+                continue;
+            } else if (raw_json[i] == '}' || raw_json[i] == ']') {
+                oformat_json << '\n';
+                --tab;
+                for (int j = 0; j < tab; ++j) {
+                    oformat_json << '\t';
+                }
+                oformat_json << raw_json[i];
+                continue;
+            } else if (raw_json[i] == ',' && 
+                            (raw_json[i+1] == '"' || 
+                            raw_json[i+1] == '{' || 
+                            raw_json[i+1] == '[')) {
+                oformat_json << raw_json[i];
+                oformat_json << '\n';
+                for (int j = 0; j < tab; ++j) {
+                    oformat_json << '\t';
+                }
+                continue;
+            } else {
+                oformat_json << raw_json[i];
+            }
+        }
+        return oformat_json.str().c_str();
+    } else {
+        return this->generate();
+    }
+}
+
 string
 JsonType::debug_info(ByteBuffer_Iterator &value_curr_pos)
 {
@@ -152,7 +197,7 @@ JsonNumber::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &jso
 }
 
 string 
-JsonNumber::generate(string ctrl_ch) 
+JsonNumber::generate(void) 
 {
     ostringstream os;
     switch (value_type_)
@@ -268,7 +313,7 @@ JsonBool::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_
 }
 
 string 
-JsonBool::generate(string ctrl_ch)
+JsonBool::generate(void)
 {
     return value_ == true? "true":"false";
 }
@@ -337,7 +382,7 @@ JsonNull::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_
 }
 
 string 
-JsonNull::generate(string ctrl_ch)
+JsonNull::generate(void)
 {
     return value_;
 }
@@ -405,7 +450,7 @@ JsonString::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &jso
 }
 
 string 
-JsonString::generate(string ctrl_ch)
+JsonString::generate(void)
 {
     return value_;
 }
@@ -533,7 +578,7 @@ JsonObject::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &jso
 }
 
 string 
-JsonObject::generate(string ctrl_ch)
+JsonObject::generate(void)
 {
     ostringstream output_obj;
     output_obj << "{";
@@ -542,12 +587,11 @@ JsonObject::generate(string ctrl_ch)
             output_obj << ",";
         }
 
-        output_obj << "\n\t" << ctrl_ch << iter->first;
-        output_obj << ": ";
+        output_obj << "\"" << iter->first << "\"";
+        output_obj << ":";
         if (iter->second.json_value_type_ == JSON_ARRAY_TYPE ||
                 iter->second.json_value_type_ == JSON_OBJECT_TYPE) {
-            string next_ctrl = ctrl_ch + "\t";
-            output_obj << (iter->second).generate(next_ctrl);
+            output_obj << (iter->second).generate();
         } else {
             if (iter->second.json_value_type_ == JSON_STRING_TYPE) {
                 output_obj << "\"" << (iter->second).generate() << "\"";
@@ -556,7 +600,7 @@ JsonObject::generate(string ctrl_ch)
             }
         }
     }
-    output_obj << "\n" << ctrl_ch << "}";
+    output_obj << "}";
 
     return output_obj.str();
 }
@@ -696,30 +740,27 @@ JsonArray::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json
     return iter;
 }
 string 
-JsonArray::generate(string ctrl_ch)
+JsonArray::generate(void)
 {
     ostringstream ostr;
     ostr << "[";
     for (std::size_t i = 0; i < array_val_.size(); ++i) {
         if (i != 0) { // 每输出一个类型后跟一个','
-            ostr << ",\n" << ctrl_ch;
-        } else {
-            ostr << "\n" << ctrl_ch;
+            ostr << ",";
         }
         if (array_val_[i].json_value_type_ == JSON_ARRAY_TYPE ||
                 array_val_[i].json_value_type_ == JSON_OBJECT_TYPE) {
-            string next_ctrl = ctrl_ch + "\t";
-            ostr << ctrl_ch << array_val_[i].generate(next_ctrl);
+            ostr <<  array_val_[i].generate();
         } else {
             if (array_val_[i].json_value_type_ == JSON_STRING_TYPE) {
-                ostr << ctrl_ch << "\"" << array_val_[i].generate() << "\"";
+                ostr <<  "\"" << array_val_[i].generate() << "\"";
             } else {
-                ostr << ctrl_ch << array_val_[i].generate();
+                ostr << array_val_[i].generate();
             }
         }
     }
 
-    ostr << "\n" << ctrl_ch << "]";
+    ostr <<  "]";
     return ostr.str();
 }
 
@@ -933,31 +974,7 @@ ValueTypeCast::operator=(ValueTypeCast val)
 
 ostream& operator<<(ostream &os, ValueTypeCast &rhs)
 {
-    switch (rhs.json_value_type_)
-    {
-    case JSON_NULL_TYPE:
-        os << rhs.json_null_value_.generate();
-        break;
-    case JSON_NUMBER_TYPE:
-        os << rhs.json_number_value_.generate();
-        break;
-    case JSON_STRING_TYPE:
-        os << rhs.json_string_value_.generate();
-        break;
-    case JSON_BOOL_TYPE:
-        os << rhs.json_bool_value_.generate();
-        break;
-    case JSON_ARRAY_TYPE:
-        os << rhs.json_array_value_.generate();
-        break;
-    case  JSON_OBJECT_TYPE:
-        os << rhs.json_object_value_.generate();
-        break;
-    default:
-        os << "NONE_TYPE";
-        break;
-    }
-
+    os << rhs.format_json();
     return os;
 }
 
@@ -988,22 +1005,22 @@ bool ValueTypeCast::operator!=(const ValueTypeCast& rhs) const
     return !(*this == rhs);
 }
 
-string ValueTypeCast::generate(string ctrl_ch)
+string ValueTypeCast::generate(void)
 {
     switch (json_value_type_)
     {
     case JSON_NULL_TYPE:
-        return json_null_value_.generate(ctrl_ch);
+        return json_null_value_.generate();
     case JSON_NUMBER_TYPE:
-        return json_number_value_.generate(ctrl_ch);
+        return json_number_value_.generate();
     case JSON_STRING_TYPE:
-        return json_string_value_.generate(ctrl_ch);
+        return json_string_value_.generate();
     case JSON_BOOL_TYPE:
-        return json_bool_value_.generate(ctrl_ch);
+        return json_bool_value_.generate();
     case JSON_ARRAY_TYPE:
-        return json_array_value_.generate(ctrl_ch);
+        return json_array_value_.generate();
     case  JSON_OBJECT_TYPE:
-        return json_object_value_.generate(ctrl_ch);
+        return json_object_value_.generate();
     default:
         break;
     }

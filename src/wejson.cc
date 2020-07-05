@@ -74,11 +74,11 @@ WeJson::parser_from_json(ByteBuffer &buff)
 
     int i = 0;
     bool quotation_marks = false;
-    ByteBuffer_Iterator tmp_pos;
     for (auto iter = start_pos; iter != buff.end(); ++iter) {
         if (quotation_marks == false && *iter == '"') {
-            tmp_pos = iter;
             quotation_marks = true;
+            simple_json_text.write_int8(*iter); // 写入字符串的第一个 "\""
+            continue;
         }
         if (quotation_marks == true) {
             if (*iter == '\\'){ 
