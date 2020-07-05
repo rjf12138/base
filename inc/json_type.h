@@ -101,7 +101,7 @@ private:
 
 // json 字符串类型
 class JsonString : public JsonType {
-    friend ostream& operator<<(ostream &os, const JsonString &rhs);
+    friend ostream& operator<<(ostream &os, JsonString &rhs);
 public:
     JsonString(void);
     JsonString(string val);
@@ -140,7 +140,7 @@ private:
 
 // json 数组类型
 class JsonArray : public JsonType {
-    friend ostream& operator<<(ostream &os, const JsonArray &rhs);
+    friend ostream& operator<<(ostream &os, JsonArray &rhs);
 public:
     JsonArray(void);
     ~JsonArray(void);
@@ -160,7 +160,7 @@ public:
 
 // json中转类型：可以安装当前存储的类型输出或是接收不同的类型
 class ValueTypeCast : public JsonType {
-    friend ostream& operator<<(ostream &os, const ValueTypeCast &rhs);
+    friend ostream& operator<<(ostream &os, ValueTypeCast &rhs);
 public:
     ValueTypeCast(void);
     ValueTypeCast(JsonBool value);

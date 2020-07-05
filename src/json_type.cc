@@ -407,9 +407,7 @@ JsonString::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &jso
 string 
 JsonString::generate(string ctrl_ch)
 {
-    string str = "\"";
-    str += value_ + "\"";
-    return str;
+    return value_;
 }
 
 ostream& operator<<(ostream &os, JsonString &rhs)
@@ -522,7 +520,7 @@ JsonObject::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &jso
             throw runtime_error(err_str);
         }
         flag = false;
-        if (*iter == '}') { // 有些解析玩就直接指向'}'， 如果不退出在回到循环会因值自增错过
+        if (*iter == '}') { // 有些解析完就直接指向'}'， 如果不退出在回到循环会因值自增错过
             break;
         }
     }
@@ -551,7 +549,11 @@ JsonObject::generate(string ctrl_ch)
             string next_ctrl = ctrl_ch + "\t";
             output_obj << (iter->second).generate(next_ctrl);
         } else {
-            output_obj << (iter->second).generate();
+            if (iter->second.json_value_type_ == JSON_STRING_TYPE) {
+                output_obj << "\"" << (iter->second).generate() << "\"";
+            } else {
+                output_obj << (iter->second).generate();
+            }
         }
     }
     output_obj << "\n" << ctrl_ch << "}";
@@ -601,6 +603,11 @@ JsonObject::operator!=(const JsonObject& rhs) const
 ValueTypeCast& 
 JsonObject::operator[](string key)
 {
+    auto iter = object_val_.find(key);
+    if (iter == object_val_.end()) {
+        string err_str = get_msg("Can't find value in JsonObject with key(%s)", key.c_str());
+        throw runtime_error(err_str);
+    }
     return object_val_[key];
 }
 
@@ -704,7 +711,11 @@ JsonArray::generate(string ctrl_ch)
             string next_ctrl = ctrl_ch + "\t";
             ostr << ctrl_ch << array_val_[i].generate(next_ctrl);
         } else {
-            ostr << ctrl_ch << array_val_[i].generate();
+            if (array_val_[i].json_value_type_ == JSON_STRING_TYPE) {
+                ostr << ctrl_ch << "\"" << array_val_[i].generate() << "\"";
+            } else {
+                ostr << ctrl_ch << array_val_[i].generate();
+            }
         }
     }
 
@@ -722,6 +733,10 @@ ostream& operator<<(ostream &os, JsonArray &rhs)
 ValueTypeCast& 
 JsonArray::operator[](size_t key)
 {
+    if (key < 0 || key >= array_val_.size()-1) {
+        string err_str = get_msg("There is out of range in JsonArray with key(%s)", key);
+        throw runtime_error(err_str);
+    }
     return array_val_[key];
 }
 
