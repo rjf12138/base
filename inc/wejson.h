@@ -22,13 +22,11 @@ public:
     int parser_from_json(string str);
     // 解析ByteBuffer保存的json文本
     int parser_from_json(ByteBuffer &buff);
-
     // 将json转换为文本输出
     string generate_to_json(void);
-    // 该类中保存的是json的object类型，采用key-value的方式访问
-    ValueTypeCast& operator[](string key);
-    // 该类中保存的是json的array类型，采用索引的方式访问
-    ValueTypeCast& operator[](int index);
+    
+    // 下标访问json的对象
+    ValueTypeCast& operator[](JsonIndex key);
 
     // 当出错时输出调试信息
     string debug_info(void);

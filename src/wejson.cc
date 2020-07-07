@@ -118,24 +118,18 @@ WeJson::parser_from_json(ByteBuffer &buff)
 }
 
 ValueTypeCast& 
-WeJson::operator[](string key)
+WeJson::operator[](JsonIndex key)
 {
-    if (json_value_.json_value_type_ != JSON_OBJECT_TYPE) {
-        string err_str = get_msg("It's not an json object type!");
+    if (json_value_.json_value_type_ == JSON_OBJECT_TYPE && 
+            key.get_type() == JSON_STRING_TYPE) {
+        return json_value_.json_object_value_[key];
+    } else if (json_value_.json_value_type_ == JSON_ARRAY_TYPE && 
+            key.get_type() == JSON_NUMBER_TYPE) {
+        return json_value_.json_array_value_[key];
+    } else {
+        string err_str = get_msg("Json: Out of range");
         throw runtime_error(err_str);
     }
-
-    return json_value_.json_object_value_[key];
-}
-ValueTypeCast& 
-WeJson::operator[](int index)
-{
-    if (json_value_.json_value_type_ != JSON_OBJECT_TYPE) {
-        string err_str = get_msg("It's not an json array type!");
-        throw runtime_error(err_str);
-    }
-
-    return json_value_.json_array_value_[index];
 }
 
 string 

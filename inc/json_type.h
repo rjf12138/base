@@ -22,6 +22,26 @@ enum NUMBER_TYPE_ {
     DOUBLE_TYPE = 10031,
 };
 
+class JsonIndex {
+public:
+    JsonIndex(void);
+    JsonIndex(const uint32_t &index);
+    JsonIndex(const string &key);
+    ~JsonIndex(void);
+
+    operator uint32_t();
+    operator string();
+
+    JsonIndex& operator=(const uint32_t &index);
+    JsonIndex& operator=(const string &key);
+
+    VALUE_TYPE get_type() const {return index_type_;}
+private:
+    VALUE_TYPE index_type_; // 只能是字符串型和数字型
+    uint32_t index_;
+    string key_;
+};
+
 class JsonType : public MsgRecord {
 public:
     // 检查当前位置的字符来判断接下来的是什么类型，具体参考doc中的资料
@@ -128,9 +148,15 @@ public:
     JsonObject(void);
     ~JsonObject(void);
 
+    // 序列化和反序列化
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
     virtual string generate(void) override;
 
+    // 操作元素
+    int add(JsonIndex &key, const ValueTypeCast &value);
+    int erase(JsonIndex &key);
+
+    // 重载操作符
     bool operator==(const JsonObject& rhs) const;
     bool operator!=(const JsonObject& rhs) const;
     JsonObject& operator=(JsonObject rhs);
@@ -147,9 +173,15 @@ public:
     JsonArray(void);
     ~JsonArray(void);
 
+    // 序列化和反序列化
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
     virtual string generate(void) override;
 
+    // 操作元素
+    int add(ValueTypeCast &value);
+    int erase(JsonIndex &index);
+
+    // 重载操作符
     ValueTypeCast& operator[](size_t key);
     const ValueTypeCast& operator[](const size_t key) const;
     bool operator==(const JsonArray& rhs) const;
@@ -193,6 +225,7 @@ public:
     bool operator!=(const ValueTypeCast& rhs) const;
 
     virtual string generate(void);
+    VALUE_TYPE get_type(void) const {return json_value_type_;}
 
 public:
     VALUE_TYPE json_value_type_;

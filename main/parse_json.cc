@@ -21,6 +21,7 @@ void help_info(void);
 vector<string> parse_arg(int argc, char *argv[]);
 
 string g_json_file_path = "";
+ValueTypeCast g_current_value = JsonNull();
 
 int main(int argc, char *argv[])
 {
@@ -48,11 +49,11 @@ void help_info(void)
     cout << "load  json_path             # 加载json文件到内存中" << endl;
     cout << "write                       # 将内存中的数据写入到文件中" << endl;
     cout << "quit                        # 退出json文件编辑模式" << endl;
-    cout << "print path key              # 打印key对应的值,数组元素, 不存在返回 \"\"" << endl;
-    cout << "set   path key   value      # 给key设置新值, 不存在打印failed" << endl;
-    cout << "creat path key   value      # 添加新的值，数组的话不考虑index直接将值添加到最后" << endl;
-    cout << "del   path key/index        # 删除key/index对应的元素" << endl;
-    cout << "size  path key              # 打印key对应对象/数组的大小" << endl;
+    cout << "set   key/index   value     # 给key设置新值, 不存在打印failed" << endl;
+    cout << "creat key         value     # 添加新的值，数组的话不考虑index直接将值添加到最后" << endl;
+    cout << "del   key/index             # 删除key/index对应的元素" << endl;
+    cout << "cd    key/index             # key是数组或是对象时，可以进入" << endl;
+    cout << "ls                          # 打印当前对象/数组中的元素, 不存在返回 \"\"" << endl;
 
     return ;
 }
@@ -78,16 +79,16 @@ EnumOption parse_arg(WeJson &js, string cmd)
                 js.write_json(g_json_file_path);
             } else if (cmd_list[0] == "quit") {
                 return EOption_Quit;
-            } else if (cmd_list[0] == "print") {
-                if (cmd_list.size() != 3) {
-                    return EOption_Error;
-                }
             } else if (cmd_list[0] == "set") {
 
             } else if (cmd_list[0] == "del") {
 
-            } else if (cmd_list[0] == "size") {
+            } else if (cmd_list[0] == "cd") {
 
+            } else if (cmd_list[0] == "ls") {
+                if (g_current_value.get_type() == JSON_NULL_TYPE) {
+                    if ()
+                }
             } else {
                 cerr << "Unknown option: " << cmd_list[0] << endl;
                 return EOption_Error;

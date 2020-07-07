@@ -2,6 +2,59 @@
 
 namespace my_util {
 
+JsonIndex::JsonIndex(void)
+ : index_type_(JSON_NUMBER_TYPE),
+   index_(0),
+   key_("")
+   {}
+
+JsonIndex::JsonIndex(const uint32_t &index)
+ : index_type_(JSON_NUMBER_TYPE),
+   index_(index),
+   key_("")
+   {}
+
+JsonIndex::JsonIndex(const string &key)
+ : index_type_(JSON_STRING_TYPE),
+   index_(0),
+   key_(key)
+   {}
+
+JsonIndex::~JsonIndex(void)
+{
+}
+
+JsonIndex::operator uint32_t()
+{
+    if (index_type_ == JSON_NUMBER_TYPE) {
+        return index_;
+    }
+
+    return 0;
+}
+JsonIndex::operator string()
+{
+    if (index_type_ == JSON_STRING_TYPE) {
+        return key_;
+    }
+
+    return "";
+}
+
+JsonIndex& 
+JsonIndex::operator=(const uint32_t &index)
+{
+    index_type_ = JSON_NUMBER_TYPE;
+    index_ = index;
+}
+
+JsonIndex& 
+JsonIndex::operator=(const string &key)
+{
+    index_type_ = JSON_STRING_TYPE;
+    key_ = key;
+}
+
 VALUE_TYPE
 JsonType::check_value_type(ByteBuffer_Iterator &iter) 
 {
@@ -605,6 +658,18 @@ JsonObject::generate(void)
     return output_obj.str();
 }
 
+int 
+JsonObject::add(JsonIndex &key, const ValueTypeCast &value)
+{
+    object_val_[key] = value;
+}
+
+int 
+JsonObject::erase(JsonIndex &index)
+{
+    object_val_.erase(index);
+}
+
 ostream& operator<<(ostream &os, JsonObject &rhs)
 {
     os << rhs.generate();
@@ -762,6 +827,18 @@ JsonArray::generate(void)
 
     ostr <<  "]";
     return ostr.str();
+}
+
+int 
+JsonArray::add(ValueTypeCast &value)
+{
+    array_val_.push_back(value);
+}
+
+int 
+JsonArray::erase(JsonIndex &index)
+{
+    array_val_.erase(index);
 }
 
 ostream& operator<<(ostream &os, JsonArray &rhs)
