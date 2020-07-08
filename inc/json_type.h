@@ -42,6 +42,29 @@ private:
     string key_;
 };
 
+class JsonIter {
+    typedef map<string, ValueTypeCast>::iterator ObjIter;
+    typedef vector<ValueTypeCast>::iterator ArrIter;
+public:
+    JsonIter(void);
+    JsonIter(const ObjIter &obj_iter);
+    JsonIter(const ArrIter &arr_iter);
+    ~JsonIter(void);
+
+    operator ObjIter();
+    operator ArrIter();
+
+    JsonIter& operator=(const ObjIter &iter);
+    JsonIter& operator=(const ArrIter &iter);
+
+    VALUE_TYPE get_type() const {return iter_type_;}
+
+private:
+    VALUE_TYPE iter_type_; // 只能是字符串型和数字型
+    ObjIter obj_iter_;
+    ArrIter arr_iter_;
+};
+
 class JsonType : public MsgRecord {
 public:
     // 检查当前位置的字符来判断接下来的是什么类型，具体参考doc中的资料
@@ -226,6 +249,7 @@ public:
 
     virtual string generate(void);
     VALUE_TYPE get_type(void) const {return json_value_type_;}
+    map<string, ValueTypeCast>::iterator begin();
 
 public:
     VALUE_TYPE json_value_type_;

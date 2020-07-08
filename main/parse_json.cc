@@ -77,6 +77,7 @@ EnumOption parse_arg(WeJson &js, string cmd)
         if (g_json_file_path != "") {
             if (cmd_list[0] == "write") {
                 js.write_json(g_json_file_path);
+                g_current_value = js.get_value();
             } else if (cmd_list[0] == "quit") {
                 return EOption_Quit;
             } else if (cmd_list[0] == "set") {
@@ -86,8 +87,8 @@ EnumOption parse_arg(WeJson &js, string cmd)
             } else if (cmd_list[0] == "cd") {
 
             } else if (cmd_list[0] == "ls") {
-                if (g_current_value.get_type() == JSON_NULL_TYPE) {
-                    if ()
+                if (js.get_type() == JSON_OBJECT_TYPE) {
+                    auto js_element = 
                 }
             } else {
                 cerr << "Unknown option: " << cmd_list[0] << endl;

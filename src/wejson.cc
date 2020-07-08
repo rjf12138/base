@@ -130,6 +130,9 @@ WeJson::operator[](JsonIndex key)
         string err_str = get_msg("Json: Out of range");
         throw runtime_error(err_str);
     }
+    
+    json_value_.json_value_type_ = JSON_NULL_TYPE;
+    return json_value_;
 }
 
 string 

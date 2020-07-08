@@ -55,6 +55,32 @@ JsonIndex::operator=(const string &key)
     key_ = key;
 }
 
+JsonIter::JsonIter(void) = default;
+JsonIter::JsonIter(const ObjIter &obj_iter)
+    : iter_type_(JSON_OBJECT_TYPE), obj_iter_(obj_iter)
+{}
+JsonIter::JsonIter(const ArrIter &arr_iter)
+    : iter_type_(JSON_ARRAY_TYPE), arr_iter_(arr_iter)
+{}
+JsonIter::~JsonIter(void) 
+{}
+
+JsonIter::operator ObjIter()
+{
+
+}
+JsonIter::operator ArrIter()
+{
+
+}
+
+JsonIter& 
+JsonIter::operator=(const ObjIter &iter)
+{}
+JsonIter& 
+JsonIter::operator=(const ArrIter &iter)
+{}
+
 VALUE_TYPE
 JsonType::check_value_type(ByteBuffer_Iterator &iter) 
 {
