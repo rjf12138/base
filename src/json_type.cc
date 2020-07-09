@@ -55,7 +55,10 @@ JsonIndex::operator=(const string &key)
     key_ = key;
 }
 
-JsonIter::JsonIter(void) = default;
+//////////////////////////////////JsonIter////////////////////////////
+JsonIter::JsonIter(void)
+    : iter_type_(JSON_NULL_TYPE)
+{}
 JsonIter::JsonIter(const ObjIter &obj_iter)
     : iter_type_(JSON_OBJECT_TYPE), obj_iter_(obj_iter)
 {}
@@ -67,20 +70,111 @@ JsonIter::~JsonIter(void)
 
 JsonIter::operator ObjIter()
 {
+    if (iter_type_ == JSON_NULL_TYPE) {
+        return obj_iter_; // 未定义行为
+    }
 
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        return obj_iter_;
+    }
 }
 JsonIter::operator ArrIter()
 {
+    if (iter_type_ == JSON_NULL_TYPE) {
+        return arr_iter_; // 未定义行为
+    }
 
+    if (iter_type_ == JSON_ARRAY_TYPE) {
+        return arr_iter_;
+    }
+    
 }
 
 JsonIter& 
 JsonIter::operator=(const ObjIter &iter)
-{}
+{
+    iter_type_ = JSON_OBJECT_TYPE;
+    obj_iter_ = iter;
+}
 JsonIter& 
 JsonIter::operator=(const ArrIter &iter)
-{}
+{
+    iter_type_ = JSON_ARRAY_TYPE;
+    arr_iter_ = iter;
+}
 
+// 前置 ++
+JsonIter& 
+JsonIter::operator++(void)
+{
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        ++obj_iter_;
+    } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        ++arr_iter_;
+    } else {
+        // 未定义行为
+    }
+
+    return *this;
+}
+JsonIter 
+JsonIter::operator++(int)
+{
+    JsonIter tmp = *this;
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        ++obj_iter_;
+    } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        ++arr_iter_;
+    } else {
+        // 未定义行为
+    }
+
+    return tmp;
+}
+JsonIter& 
+JsonIter::operator--(void)
+{
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        --obj_iter_;
+    } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        --arr_iter_;
+    } else {
+        // 未定义行为
+    }
+
+    return *this;
+}
+JsonIter 
+JsonIter::operator--(int)
+{
+    JsonIter tmp = *this;
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        --obj_iter_;
+    } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        --arr_iter_;
+    } else {
+        // 未定义行为
+    }
+
+    return tmp;
+}
+
+pair<string, ValueTypeCast>& 
+JsonIter::operator*()
+{
+    pair<string, ValueTypeCast> ret;
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        ret = *obj_iter_;
+    } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        ret.second = *arr_iter_;
+    } else {
+        // 未定义行为
+    }
+
+    return ret;
+}
+
+/////////////////////////////////////////////////////////
 VALUE_TYPE
 JsonType::check_value_type(ByteBuffer_Iterator &iter) 
 {
@@ -1129,6 +1223,34 @@ string ValueTypeCast::generate(void)
     }
 
     return "";
+}
+
+JsonIter 
+ValueTypeCast::begin(void)
+{
+    if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.array_val_.begin();
+    } else if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.object_val_.begin();
+    } else {
+        // 未定义行为
+    }
+
+    return json_object_value_.object_val_.begin();
+}
+
+JsonIter 
+ValueTypeCast::end(void)
+{
+    if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.array_val_.end();
+    } else if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.object_val_.end();
+    } else {
+        // 未定义行为
+    }
+
+    return json_object_value_.object_val_.end();
 }
 
 }

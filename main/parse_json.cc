@@ -87,8 +87,8 @@ EnumOption parse_arg(WeJson &js, string cmd)
             } else if (cmd_list[0] == "cd") {
 
             } else if (cmd_list[0] == "ls") {
-                if (js.get_type() == JSON_OBJECT_TYPE) {
-                    auto js_element = 
+                if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
+                    auto iter = g_current_value.begin();
                 }
             } else {
                 cerr << "Unknown option: " << cmd_list[0] << endl;

@@ -56,6 +56,18 @@ public:
 
     JsonIter& operator=(const ObjIter &iter);
     JsonIter& operator=(const ArrIter &iter);
+    
+    // 前置 ++
+    JsonIter& operator++(void);
+    // 后置 ++
+    JsonIter operator++(int);
+    // 前置 --
+    JsonIter& operator--(void);
+    // 后置 --
+    JsonIter operator--(int);
+    // 进行取值时，数组和对象都返回一个pair,数组的first是下标，对象的first是key
+    pair<string, ValueTypeCast>& operator*();
+
 
     VALUE_TYPE get_type() const {return iter_type_;}
 
@@ -185,7 +197,7 @@ public:
     JsonObject& operator=(JsonObject rhs);
     ValueTypeCast& operator[](string key);
 
-private:
+public:
     map<string, ValueTypeCast> object_val_;
 };
 
@@ -249,7 +261,8 @@ public:
 
     virtual string generate(void);
     VALUE_TYPE get_type(void) const {return json_value_type_;}
-    map<string, ValueTypeCast>::iterator begin();
+    JsonIter begin(void);
+    JsonIter end(void);
 
 public:
     VALUE_TYPE json_value_type_;
