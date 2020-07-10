@@ -6,6 +6,9 @@
 #include "msg_record.h"
 
 namespace my_util {
+
+class ValueTypeCast;
+
 enum VALUE_TYPE {
     UNKNOWN_TYPE = -1000,
     JSON_NUMBER_TYPE = 10001,
@@ -44,18 +47,24 @@ private:
 
 class JsonIter {
     typedef map<string, ValueTypeCast>::iterator ObjIter;
+    typedef map<string, ValueTypeCast>::const_iterator ConstObjIter;
     typedef vector<ValueTypeCast>::iterator ArrIter;
+    typedef vector<ValueTypeCast>::const_iterator ConstArrIter;
 public:
     JsonIter(void);
     JsonIter(const ObjIter &obj_iter);
     JsonIter(const ArrIter &arr_iter);
     ~JsonIter(void);
 
-    operator ObjIter();
-    operator ArrIter();
+    operator ObjIter() const;
+    operator ConstObjIter() const;
+    operator ArrIter() const;
+    operator ConstArrIter() const;
 
     JsonIter& operator=(const ObjIter &iter);
     JsonIter& operator=(const ArrIter &iter);
+    bool operator==(const JsonIter &lhs);
+    bool operator!=(const JsonIter &lhs);
     
     // 前置 ++
     JsonIter& operator++(void);
@@ -66,7 +75,7 @@ public:
     // 后置 --
     JsonIter operator--(int);
     // 进行取值时，数组和对象都返回一个pair,数组的first是下标，对象的first是key
-    pair<string, ValueTypeCast>& operator*();
+    pair<string, ValueTypeCast> operator*();
 
 
     VALUE_TYPE get_type() const {return iter_type_;}
@@ -176,7 +185,6 @@ private:
 };
 
 // json 对象类型
-class ValueTypeCast;
 class JsonObject : public JsonType {
     friend ostream& operator<<(ostream &os, JsonObject &rhs);
 public:
@@ -214,7 +222,7 @@ public:
 
     // 操作元素
     int add(ValueTypeCast &value);
-    int erase(JsonIndex &index);
+    vector<ValueTypeCast>::iterator erase(JsonIter &index);
 
     // 重载操作符
     ValueTypeCast& operator[](size_t key);

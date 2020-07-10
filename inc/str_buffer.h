@@ -7,13 +7,14 @@ namespace my_util {
 
 class StrBuffer {
 public:
-    StrBuffer(const string str);
+    StrBuffer(const string &str);
     ~StrBuffer(void);
 
-    vector<string> split_str(const string& p_separator);
-    string remove_str_from_buffer(const string& p_str2);
+    vector<string> split_str(const string& separator);
+    string remove_str_from_buffer(const string& str2);
 private:
     string str_buffer_;
+    vector<string> split_strs_;
 };
 
 }

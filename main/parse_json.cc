@@ -18,57 +18,65 @@ enum EnumOption {
 };
 
 void help_info(void);
-vector<string> parse_arg(int argc, char *argv[]);
+EnumOption parse_arg(string cmd);
 
 string g_json_file_path = "";
+WeJson g_json;
 ValueTypeCast g_current_value = JsonNull();
 
 int main(int argc, char *argv[])
 {
-    if (argc <= 1) {
-        help_info();
-        return 1;
+    if (argc < 1) {
+        std::cout << "input json path!" << endl;
+        return 0;
     }
 
-    string file_path = argv[1];
-    string json_key = argv[2];
-
-    WeJson js;
-    js.open_json(file_path);
-    // cout << js.generate_to_json() << endl;
-    cout  << js[json_key];
+    string input;
+    while (true) {
+        cout << ">";
+        cin >> input;
+        if (input == "quit") {
+            break;
+        }
+        parse_arg(input);
+    }
     
-
+    cout << "edit over!" << endl; 
     return 0;
 }
 
 void help_info(void)
 {
-    cout << "parse_json [OPTION] param1 param2 param3 ..." << endl;
-    cout << "help                        # 打印帮助信息" << endl;
-    cout << "load  json_path             # 加载json文件到内存中" << endl;
-    cout << "write                       # 将内存中的数据写入到文件中" << endl;
-    cout << "quit                        # 退出json文件编辑模式" << endl;
-    cout << "set   key/index   value     # 给key设置新值, 不存在打印failed" << endl;
-    cout << "creat key         value     # 添加新的值，数组的话不考虑index直接将值添加到最后" << endl;
-    cout << "del   key/index             # 删除key/index对应的元素" << endl;
-    cout << "cd    key/index             # key是数组或是对象时，可以进入" << endl;
-    cout << "ls                          # 打印当前对象/数组中的元素, 不存在返回 \"\"" << endl;
+    cout << endl;
+    cout << "   parse_json [OPTION] param1 param2 param3 ..." << endl;
+    cout << "   help                        # 打印帮助信息" << endl;
+    cout << "   load  json_path             # 加载json文件到内存中" << endl;
+    cout << "   write                       # 将内存中的数据写入到文件中" << endl;
+    cout << "   quit                        # 退出json文件编辑模式" << endl;
+    cout << "   set   key/index   value     # 给key设置新值, 不存在打印failed" << endl;
+    cout << "   creat key         value     # 添加新的值，数组的话不考虑index直接将值添加到最后" << endl;
+    cout << "   del   key/index             # 删除key/index对应的元素" << endl;
+    cout << "   cd    key/index             # key是数组或是对象时，可以进入" << endl;
+    cout << "   ls                          # 打印当前对象/数组中的元素, 不存在返回 \"\"" << endl;
+    cout << endl;
 
     return ;
 }
 
-EnumOption parse_arg(WeJson &js, string cmd)
+EnumOption parse_arg(string cmd)
 {
     StrBuffer str(cmd);
     vector<string> cmd_list = str.split_str(" ");
-
+    
+    for (auto iter = cmd_list.begin(); iter != cmd_list.end(); ++iter) {
+        cout << *iter << endl;
+    }
     if (cmd_list.size() == 0) {
         return EOption_Error;
     }
     try {
-        if (cmd_list[0] == "load") {
-            js.open_json(cmd_list[1]);
+        if (cmd_list[0] == "load" && cmd_list.size() > 1) {
+            g_json.open_json(cmd_list[1]);
             g_json_file_path = cmd_list[1];
         } else if (cmd_list[0] == "help") {
             help_info();
@@ -76,8 +84,8 @@ EnumOption parse_arg(WeJson &js, string cmd)
         
         if (g_json_file_path != "") {
             if (cmd_list[0] == "write") {
-                js.write_json(g_json_file_path);
-                g_current_value = js.get_value();
+                g_json.write_json(g_json_file_path);
+                g_current_value = g_json.get_value();
             } else if (cmd_list[0] == "quit") {
                 return EOption_Quit;
             } else if (cmd_list[0] == "set") {
@@ -88,14 +96,25 @@ EnumOption parse_arg(WeJson &js, string cmd)
 
             } else if (cmd_list[0] == "ls") {
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
-                    auto iter = g_current_value.begin();
+                    auto iter_begin = g_current_value.begin();
+                    auto iter_end = g_current_value.end();
+                    for (auto iter = iter_begin; iter != iter_end; ++iter) {
+                        auto tmp = *iter;
+                        if (iter.get_type() == JSON_OBJECT_TYPE) {
+                            cout << tmp.first << ">" << "obj_value" << endl;
+                        } else if (iter.get_type() == JSON_ARRAY_TYPE) {
+                            cout << tmp.first << ">" << "arr_value" << endl;
+                        } else {
+                            cout << tmp.first << "-" << tmp.second << endl;
+                        }
+                    }
                 }
             } else {
                 cerr << "Unknown option: " << cmd_list[0] << endl;
                 return EOption_Error;
             }
         } else {
-            cerr << "Load json file first" << endl;
+            cerr << "\n\nLoad json file first\n\n" << endl;
             return EOption_Error;
         }
     } catch (runtime_error err) {

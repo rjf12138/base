@@ -46,6 +46,8 @@ JsonIndex::operator=(const uint32_t &index)
 {
     index_type_ = JSON_NUMBER_TYPE;
     index_ = index;
+
+    return *this;
 }
 
 JsonIndex& 
@@ -53,6 +55,8 @@ JsonIndex::operator=(const string &key)
 {
     index_type_ = JSON_STRING_TYPE;
     key_ = key;
+
+    return *this;
 }
 
 //////////////////////////////////JsonIter////////////////////////////
@@ -68,26 +72,40 @@ JsonIter::JsonIter(const ArrIter &arr_iter)
 JsonIter::~JsonIter(void) 
 {}
 
-JsonIter::operator ObjIter()
+JsonIter::operator ObjIter() const
 {
-    if (iter_type_ == JSON_NULL_TYPE) {
+    if (iter_type_ != JSON_OBJECT_TYPE) {
         return obj_iter_; // 未定义行为
     }
 
-    if (iter_type_ == JSON_OBJECT_TYPE) {
-        return obj_iter_;
-    }
+    return obj_iter_;
 }
-JsonIter::operator ArrIter()
+
+JsonIter::operator ConstObjIter() const
 {
-    if (iter_type_ == JSON_NULL_TYPE) {
+    if (iter_type_ != JSON_OBJECT_TYPE) {
+        return obj_iter_; // 未定义行为
+    }
+
+    return obj_iter_;
+}
+
+JsonIter::operator ArrIter() const
+{
+    if (iter_type_ != JSON_ARRAY_TYPE) {
         return arr_iter_; // 未定义行为
     }
 
-    if (iter_type_ == JSON_ARRAY_TYPE) {
-        return arr_iter_;
+    return arr_iter_;
+}
+
+JsonIter::operator ConstArrIter() const
+{
+    if (iter_type_ != JSON_ARRAY_TYPE) {
+        return arr_iter_; // 未定义行为
     }
-    
+
+    return arr_iter_;
 }
 
 JsonIter& 
@@ -95,12 +113,47 @@ JsonIter::operator=(const ObjIter &iter)
 {
     iter_type_ = JSON_OBJECT_TYPE;
     obj_iter_ = iter;
+
+    return *this;
 }
 JsonIter& 
 JsonIter::operator=(const ArrIter &iter)
 {
     iter_type_ = JSON_ARRAY_TYPE;
     arr_iter_ = iter;
+
+    return *this;
+}
+
+bool 
+JsonIter::operator==(const JsonIter &lhs)
+{
+    if (iter_type_ != JSON_ARRAY_TYPE || iter_type_ != JSON_OBJECT_TYPE) {
+        return false;
+    }
+
+    if (lhs.iter_type_ != JSON_OBJECT_TYPE || lhs.iter_type_ != JSON_ARRAY_TYPE) {
+        return false;
+    }
+
+    if (iter_type_ != lhs.iter_type_) {
+        return false;
+    }
+
+    if (iter_type_ == JSON_ARRAY_TYPE && arr_iter_ == lhs.arr_iter_) {
+        return true;
+    }
+
+    if (iter_type_ == JSON_OBJECT_TYPE && obj_iter_ == lhs.obj_iter_) {
+        return true;
+    }
+
+    return false;
+}
+bool 
+JsonIter::operator!=(const JsonIter &lhs)
+{
+    return !(*this == lhs);
 }
 
 // 前置 ++
@@ -117,6 +170,7 @@ JsonIter::operator++(void)
 
     return *this;
 }
+
 JsonIter 
 JsonIter::operator++(int)
 {
@@ -159,7 +213,7 @@ JsonIter::operator--(int)
     return tmp;
 }
 
-pair<string, ValueTypeCast>& 
+pair<string, ValueTypeCast>
 JsonIter::operator*()
 {
     pair<string, ValueTypeCast> ret;
@@ -782,12 +836,14 @@ int
 JsonObject::add(JsonIndex &key, const ValueTypeCast &value)
 {
     object_val_[key] = value;
+
+    return 0;
 }
 
-int 
+int
 JsonObject::erase(JsonIndex &index)
 {
-    object_val_.erase(index);
+    return object_val_.erase(index);
 }
 
 ostream& operator<<(ostream &os, JsonObject &rhs)
@@ -953,12 +1009,14 @@ int
 JsonArray::add(ValueTypeCast &value)
 {
     array_val_.push_back(value);
+
+    return 0;
 }
 
-int 
-JsonArray::erase(JsonIndex &index)
+vector<ValueTypeCast>::iterator
+JsonArray::erase(JsonIter &index)
 {
-    array_val_.erase(index);
+    return array_val_.erase(index, index);
 }
 
 ostream& operator<<(ostream &os, JsonArray &rhs)
