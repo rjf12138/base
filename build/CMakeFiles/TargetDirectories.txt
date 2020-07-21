@@ -1,8 +1,0 @@
-/home/ruanjian/workspace/project/base/build/CMakeFiles/rebuild_cache.dir
-/home/ruanjian/workspace/project/base/build/CMakeFiles/edit_cache.dir
-/home/ruanjian/workspace/project/base/build/src/CMakeFiles/rebuild_cache.dir
-/home/ruanjian/workspace/project/base/build/src/CMakeFiles/base.dir
-/home/ruanjian/workspace/project/base/build/src/CMakeFiles/edit_cache.dir
-/home/ruanjian/workspace/project/base/build/main/CMakeFiles/rebuild_cache.dir
-/home/ruanjian/workspace/project/base/build/main/CMakeFiles/parse_json.dir
-/home/ruanjian/workspace/project/base/build/main/CMakeFiles/edit_cache.dir
