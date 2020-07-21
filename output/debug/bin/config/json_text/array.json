@@ -1,0 +1,26 @@
+{
+    "friends": [
+        {
+          "id": 0,
+          "name": "Susie Barr"
+        },
+        {
+          "id": 1,
+          "name": "Callie Strickland",
+          "arr":[
+            "1",
+            "2",
+            "4",
+            {
+              "fu":"lll",
+              "num": 2345
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Shanna Johns"
+        }
+      ],
+    "test": "test hell"
+}
