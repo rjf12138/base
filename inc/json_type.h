@@ -45,7 +45,7 @@ private:
     string key_;
 };
 
-class JsonIter {
+class JsonIter : public MsgRecord {
     typedef map<string, ValueTypeCast>::iterator ObjIter;
     typedef map<string, ValueTypeCast>::const_iterator ConstObjIter;
     typedef vector<ValueTypeCast>::iterator ArrIter;

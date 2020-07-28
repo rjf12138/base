@@ -128,11 +128,11 @@ JsonIter::operator=(const ArrIter &iter)
 bool 
 JsonIter::operator==(const JsonIter &lhs)
 {
-    if (iter_type_ != JSON_ARRAY_TYPE || iter_type_ != JSON_OBJECT_TYPE) {
+    if (iter_type_ != JSON_ARRAY_TYPE && iter_type_ != JSON_OBJECT_TYPE) {
         return false;
     }
 
-    if (lhs.iter_type_ != JSON_OBJECT_TYPE || lhs.iter_type_ != JSON_ARRAY_TYPE) {
+    if (lhs.iter_type_ != JSON_OBJECT_TYPE && lhs.iter_type_ != JSON_ARRAY_TYPE) {
         return false;
     }
 
@@ -150,6 +150,7 @@ JsonIter::operator==(const JsonIter &lhs)
 
     return false;
 }
+
 bool 
 JsonIter::operator!=(const JsonIter &lhs)
 {
@@ -165,7 +166,8 @@ JsonIter::operator++(void)
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
         ++arr_iter_;
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call JsonIter::operator++(void) failed!");
+        throw runtime_error(err_str);
     }
 
     return *this;
@@ -180,7 +182,8 @@ JsonIter::operator++(int)
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
         ++arr_iter_;
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call JsonIter::operator++(int) failed!");
+        throw runtime_error(err_str);
     }
 
     return tmp;
@@ -193,7 +196,8 @@ JsonIter::operator--(void)
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
         --arr_iter_;
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call JsonIter::operator--(void) failed!");
+        throw runtime_error(err_str);
     }
 
     return *this;
@@ -207,7 +211,8 @@ JsonIter::operator--(int)
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
         --arr_iter_;
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call JsonIter::operator--(int) failed!");
+        throw runtime_error(err_str);
     }
 
     return tmp;
@@ -220,9 +225,11 @@ JsonIter::operator*()
     if (iter_type_ == JSON_OBJECT_TYPE) {
         ret = *obj_iter_;
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        ret.first = "arr_ele";
         ret.second = *arr_iter_;
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call JsonIter::operator*() failed!");
+        throw runtime_error(err_str);
     }
 
     return ret;
@@ -1291,7 +1298,8 @@ ValueTypeCast::begin(void)
     } else if (json_value_type_ == JSON_OBJECT_TYPE) {
         return json_object_value_.object_val_.begin();
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call itertor end() failed!");
+        throw runtime_error(err_str);
     }
 
     return json_object_value_.object_val_.begin();
@@ -1305,7 +1313,8 @@ ValueTypeCast::end(void)
     } else if (json_value_type_ == JSON_OBJECT_TYPE) {
         return json_object_value_.object_val_.end();
     } else {
-        // 未定义行为
+        string err_str = get_msg("unknown type: call itertor end() failed!");
+        throw runtime_error(err_str);
     }
 
     return json_object_value_.object_val_.end();

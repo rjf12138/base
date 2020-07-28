@@ -26,10 +26,14 @@ ValueTypeCast g_current_value = JsonNull();
 
 int main(int argc, char *argv[])
 {
-    if (argc < 1) {
+    if (argc < 2) {
         std::cout << "input json path!" << endl;
         return 0;
     }
+
+    g_json_file_path = argv[argc-1];
+    g_json.open_json(g_json_file_path);
+    g_current_value = g_json.get_value();
 
     string input;
     while (true) {
@@ -69,19 +73,19 @@ EnumOption parse_arg(string cmd)
     vector<string> cmd_list = str.split_str(" ");
     
     for (auto iter = cmd_list.begin(); iter != cmd_list.end(); ++iter) {
-        cout << *iter << endl;
+        cout << *iter << " ";
     }
+    cout << endl;
+
     if (cmd_list.size() == 0) {
         return EOption_Error;
     }
     try {
-        if (cmd_list[0] == "load" && cmd_list.size() > 1) {
-            g_json.open_json(cmd_list[1]);
-            g_json_file_path = cmd_list[1];
-        } else if (cmd_list[0] == "help") {
+        if (cmd_list[0] == "help") {
             help_info();
+            return EOption_Complete;
         }
-        
+        cout << "g_json_file_path: " << g_json_file_path << endl;
         if (g_json_file_path != "") {
             if (cmd_list[0] == "write") {
                 g_json.write_json(g_json_file_path);
@@ -93,7 +97,11 @@ EnumOption parse_arg(string cmd)
             } else if (cmd_list[0] == "del") {
 
             } else if (cmd_list[0] == "cd") {
-
+                if (g_current_value.get_type() == JSON_OBJECT_TYPE ||
+                    g_current_value.get_type() == JSON_ARRAY_TYPE)
+                {
+                    
+                }
             } else if (cmd_list[0] == "ls") {
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
                     auto iter_begin = g_current_value.begin();
@@ -101,11 +109,11 @@ EnumOption parse_arg(string cmd)
                     for (auto iter = iter_begin; iter != iter_end; ++iter) {
                         auto tmp = *iter;
                         if (iter.get_type() == JSON_OBJECT_TYPE) {
-                            cout << tmp.first << ">" << "obj_value" << endl;
+                            cout << "\t" << tmp.first << " -> " << "obj_value" << endl;
                         } else if (iter.get_type() == JSON_ARRAY_TYPE) {
-                            cout << tmp.first << ">" << "arr_value" << endl;
+                            cout << "\t" << tmp.first << " -> " << "arr_value" << endl;
                         } else {
-                            cout << tmp.first << "-" << tmp.second << endl;
+                            cout << "\t" << tmp.first << " -- " << tmp.second << endl;
                         }
                     }
                 }
