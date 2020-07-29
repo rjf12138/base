@@ -11,7 +11,7 @@ public:
     ~StrBuffer(void);
 
     vector<string> split_str(const string& separator);
-    string remove_str_from_buffer(const string& str2);
+    string remove_str_from_buffer(const string& str2); // WRANNING
 private:
     string str_buffer_;
     vector<string> split_strs_;

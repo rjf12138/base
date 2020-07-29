@@ -78,7 +78,7 @@ public:
     pair<string, ValueTypeCast> operator*();
 
 
-    VALUE_TYPE get_type() const {return iter_type_;}
+    VALUE_TYPE get_iter_type() const {return iter_type_;}
 
 private:
     VALUE_TYPE iter_type_; // 只能是字符串型和数字型
@@ -267,8 +267,11 @@ public:
     bool operator==(const ValueTypeCast& rhs) const;
     bool operator!=(const ValueTypeCast& rhs) const;
 
+    ValueTypeCast operator[](JsonIndex key);
+
     virtual string generate(void);
     VALUE_TYPE get_type(void) const {return json_value_type_;}
+    
     JsonIter begin(void);
     JsonIter end(void);
 

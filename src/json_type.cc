@@ -225,7 +225,7 @@ JsonIter::operator*()
     if (iter_type_ == JSON_OBJECT_TYPE) {
         ret = *obj_iter_;
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
-        ret.first = "arr_ele";
+        ret.first = "";
         ret.second = *arr_iter_;
     } else {
         string err_str = get_msg("unknown type: call JsonIter::operator*() failed!");
@@ -1265,6 +1265,22 @@ bool ValueTypeCast::operator==(const ValueTypeCast& rhs) const
 bool ValueTypeCast::operator!=(const ValueTypeCast& rhs) const
 {
     return !(*this == rhs);
+}
+
+ValueTypeCast ValueTypeCast::operator[](JsonIndex key)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE && 
+            key.get_type() == JSON_STRING_TYPE) {
+        return json_object_value_[key];
+    } else if (json_value_type_ == JSON_ARRAY_TYPE && 
+            key.get_type() == JSON_NUMBER_TYPE) {
+        return json_array_value_[key];
+    } else {
+        string err_str = get_msg("Json: Out of range");
+        throw runtime_error(err_str);
+    }
+    
+    return json_null_value_;
 }
 
 string ValueTypeCast::generate(void)

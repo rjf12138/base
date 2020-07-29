@@ -15,9 +15,9 @@ StrBuffer::split_str(const string& separator)
     
     string::size_type pos;
     uint32_t next_search_start_pos = 0;
-    while ((pos = store_str.find(separator)) != string::npos) {      // 在 l_store_str 中找 p_separator 首次出现的位置
-        string tmp_str = string(store_str, 0, pos);                 // 获取 l_store_str 开始位置到 p_separator 首次出现中间的字符串
-        if (tmp_str.size() > 0) {                                                 // 排除 p_separator 出现在 l_store_str 开始位置的情况
+    while ((pos = store_str.find(separator)) != string::npos) {      // 在 store_str 中找 separator 首次出现的位置
+        string tmp_str = string(store_str, 0, pos);                  // 获取 store_str 开始位置到 separator 首次出现中间的字符串
+        if (tmp_str.size() > 0) {                                    // 排除 separator 出现在 store_str 开始位置的情况
             split_strs_.push_back(tmp_str);
         }
         next_search_start_pos = pos + separator.size();
@@ -25,7 +25,7 @@ StrBuffer::split_str(const string& separator)
         if (next_search_start_pos < store_str.size()) {
             store_str = string(store_str, next_search_start_pos, store_str.size() - next_search_start_pos);
         } else {
-            // 当 l_next_search_start_pos 大于 l_store_str 的长度时， 说明 l_store_str 中已经没有可以用的字符串了，所以将它设为空， 防止触发之后的赋值
+            // 当 next_search_start_pos 大于 store_str 的长度时， 说明 store_str 中已经没有可以用的字符串了，所以将它设为空， 防止触发之后的赋值
             store_str = "";
             break;
         }
