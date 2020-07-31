@@ -14,6 +14,12 @@ JsonIndex::JsonIndex(const uint32_t &index)
    key_("")
    {}
 
+JsonIndex::JsonIndex(const int32_t &index)
+ : index_type_(JSON_NUMBER_TYPE),
+   index_(index),
+   key_("")
+   {}
+
 JsonIndex::JsonIndex(const string &key)
  : index_type_(JSON_STRING_TYPE),
    index_(0),
@@ -1020,10 +1026,16 @@ JsonArray::add(ValueTypeCast &value)
     return 0;
 }
 
-vector<ValueTypeCast>::iterator
-JsonArray::erase(JsonIter &index)
+int
+JsonArray::erase(JsonIndex &index)
 {
-    return array_val_.erase(index, index);
+    int move_dis = index;
+    auto remove_iter = array_val_.begin();
+    // 移动迭代器index个距离
+    advance(remove_iter, index);
+    array_val_.erase(remove_iter, remove_iter);
+    
+    return 1;
 }
 
 ostream& operator<<(ostream &os, JsonArray &rhs)
@@ -1304,6 +1316,41 @@ string ValueTypeCast::generate(void)
     }
 
     return "";
+}
+
+int ValueTypeCast::erase(JsonIndex index)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        json_object_value_.erase(index);
+    } else if (json_value_type_ == JSON_ARRAY_TYPE) {
+        json_array_value_.erase(index);
+    } else {
+        // 其他类型不做考虑
+    }
+
+    return 1;
+}
+
+int ValueTypeCast::add(ValueTypeCast &value)
+{
+    if (json_value_type_ == JSON_ARRAY_TYPE) {
+        json_array_value_.add(value);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+
+int ValueTypeCast::add(JsonIndex &key, const ValueTypeCast &value)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        json_object_value_.add(key, value);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
 }
 
 JsonIter 

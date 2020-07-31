@@ -95,10 +95,18 @@ EnumOption parse_arg(string cmd)
             } else if (cmd_list[0] == "mod") {
                 // to-do
             } else if (cmd_list[0] == "add") {
-                // to-do
-            } else if (cmd_list[0] == "del") {
-                // to-do
-            } else if (cmd_list[0] == "cd" && cmd_list.size() == 2) { // 无法进入关键字中带有空格的类型
+                if (g_current_value.get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 3) {
+                    g_current_value.add(cmd_list[1], cmd_list[2]);
+                } else if (g_current_value.get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 2) {
+                    g_current_value.erase(stoi(cmd_list[1]));
+                }
+            } else if (cmd_list[0] == "del" && cmd_list.size() == 2) {
+                if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
+                    g_current_value.erase(cmd_list[1]);
+                } else if (g_current_value.get_type() == JSON_ARRAY_TYPE) {
+                    g_current_value.erase(stoi(cmd_list[1]));
+                }
+            } else if (cmd_list[0] == "cd" && cmd_list.size() == 2) { // 无法进入关键字中带有空格的类型, 无法回到上级目录
                 VALUE_TYPE next_node_type = JSON_NULL_TYPE;
                 ValueTypeCast next_node_value;
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE) {

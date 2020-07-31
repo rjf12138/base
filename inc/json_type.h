@@ -29,6 +29,7 @@ class JsonIndex {
 public:
     JsonIndex(void);
     JsonIndex(const uint32_t &index);
+    JsonIndex(const int32_t &index);
     JsonIndex(const string &key);
     ~JsonIndex(void);
 
@@ -222,7 +223,7 @@ public:
 
     // 操作元素
     int add(ValueTypeCast &value);
-    vector<ValueTypeCast>::iterator erase(JsonIter &index);
+    int erase(JsonIndex &index);
 
     // 重载操作符
     ValueTypeCast& operator[](size_t key);
@@ -270,10 +271,20 @@ public:
     ValueTypeCast operator[](JsonIndex key);
 
     virtual string generate(void);
+    // 根据输入，自动解析并设置值
+    bool parse(string input_str);
     VALUE_TYPE get_type(void) const {return json_value_type_;}
     
+    // 只有Json的数组或对象类型支持
+    // 返回数组或是对象的起始和结束迭代器
     JsonIter begin(void);
     JsonIter end(void);
+    // 数组或是对象删除元素
+    int erase(JsonIndex index);
+    // 当前类型为数组时添加元素
+    int add(ValueTypeCast &value);
+    // 当前类型为对象时添加元素
+    int add(JsonIndex &key, const ValueTypeCast &value);
 
 public:
     VALUE_TYPE json_value_type_;
