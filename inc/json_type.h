@@ -222,7 +222,7 @@ public:
     virtual string generate(void) override;
 
     // 操作元素
-    int add(ValueTypeCast &value);
+    int add(const ValueTypeCast &value);
     int erase(JsonIndex &index);
 
     // 重载操作符
@@ -282,9 +282,15 @@ public:
     // 数组或是对象删除元素
     int erase(JsonIndex index);
     // 当前类型为数组时添加元素
-    int add(ValueTypeCast &value);
+    int add(ValueTypeCast value);
+    int add(string value);
+    int add(bool value);
+    int add(JsonNumber value);
     // 当前类型为对象时添加元素
-    int add(JsonIndex &key, const ValueTypeCast &value);
+    int add(JsonIndex key, ValueTypeCast value);
+    int add(JsonIndex key, string value);
+    int add(JsonIndex key, bool value);
+    int add(JsonIndex key, JsonNumber value);
 
 public:
     VALUE_TYPE json_value_type_;

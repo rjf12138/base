@@ -624,7 +624,7 @@ JsonNull::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_
 string 
 JsonNull::generate(void)
 {
-    return value_;
+    return "null";
 }
 
 ostream& operator<<(ostream &os, JsonNull &rhs)
@@ -1019,7 +1019,7 @@ JsonArray::generate(void)
 }
 
 int 
-JsonArray::add(ValueTypeCast &value)
+JsonArray::add(const ValueTypeCast &value)
 {
     array_val_.push_back(value);
 
@@ -1029,7 +1029,6 @@ JsonArray::add(ValueTypeCast &value)
 int
 JsonArray::erase(JsonIndex &index)
 {
-    int move_dis = index;
     auto remove_iter = array_val_.begin();
     // 移动迭代器index个距离
     advance(remove_iter, index);
@@ -1331,7 +1330,7 @@ int ValueTypeCast::erase(JsonIndex index)
     return 1;
 }
 
-int ValueTypeCast::add(ValueTypeCast &value)
+int ValueTypeCast::add(ValueTypeCast value)
 {
     if (json_value_type_ == JSON_ARRAY_TYPE) {
         json_array_value_.add(value);
@@ -1342,7 +1341,42 @@ int ValueTypeCast::add(ValueTypeCast &value)
     return 1;
 }
 
-int ValueTypeCast::add(JsonIndex &key, const ValueTypeCast &value)
+int ValueTypeCast::add(string value)
+{
+    JsonString js(value);
+    if (json_value_type_ == JSON_ARRAY_TYPE) {
+        json_array_value_.add(js);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+
+int ValueTypeCast::add(bool value)
+{
+    JsonBool jb(value);
+    if (json_value_type_ == JSON_ARRAY_TYPE) {
+        json_array_value_.add(jb);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+
+int ValueTypeCast::add(JsonNumber value)
+{
+    if (json_value_type_ == JSON_ARRAY_TYPE) {
+        json_array_value_.add(value);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+
+int ValueTypeCast::add(JsonIndex key, ValueTypeCast value)
 {
     if (json_value_type_ == JSON_OBJECT_TYPE) {
         json_object_value_.add(key, value);
@@ -1352,6 +1386,40 @@ int ValueTypeCast::add(JsonIndex &key, const ValueTypeCast &value)
 
     return 1;
 }
+
+int ValueTypeCast::add(JsonIndex key, string value)
+{
+    JsonString js(value);
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        json_object_value_.add(key, js);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+int ValueTypeCast::add(JsonIndex key, bool value)
+{
+    JsonBool jb(value);
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        json_object_value_.add(key, jb);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+int ValueTypeCast::add(JsonIndex key, JsonNumber value)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        json_object_value_.add(key, value);
+    } else {
+        // 其他类型不起作用
+    }
+
+    return 1;
+}
+
 
 JsonIter 
 ValueTypeCast::begin(void)

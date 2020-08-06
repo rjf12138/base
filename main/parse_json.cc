@@ -87,7 +87,7 @@ EnumOption parse_arg(string cmd)
         }
         
         if (g_json_file_path != "") {
-            if (cmd_list[0] == "write") {
+            if (cmd_list[0] == "write") { // 存在问题不是覆盖写
                 g_json.write_json(g_json_file_path);
                 g_current_value = g_json.get_value();
             } else if (cmd_list[0] == "quit") {
@@ -96,11 +96,21 @@ EnumOption parse_arg(string cmd)
                 // to-do
             } else if (cmd_list[0] == "add") {
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 3) {
-                    g_current_value.add(cmd_list[1], cmd_list[2]);
+                    if (cmd_list[2][0] == '"') {
+                        g_current_value.add(cmd_list[1], cmd_list[2]);
+                    } else {
+                        double value = stod(cmd_list[2]);
+                        g_current_value.add(cmd_list[1], value);
+                    }
                 } else if (g_current_value.get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 2) {
-                    g_current_value.erase(stoi(cmd_list[1]));
+                    if (cmd_list[2][0] == '"') {
+                        g_current_value.add(cmd_list[1], cmd_list[2]);
+                    } else {
+                        double value = stod(cmd_list[2]);
+                        g_current_value.add(cmd_list[1], value);
+                    }
                 }
-            } else if (cmd_list[0] == "del" && cmd_list.size() == 2) {
+            } else if (cmd_list[0] == "del" && cmd_list.size() == 2) { //存在问题，没有删除
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
                     g_current_value.erase(cmd_list[1]);
                 } else if (g_current_value.get_type() == JSON_ARRAY_TYPE) {
@@ -120,7 +130,7 @@ EnumOption parse_arg(string cmd)
                 if (next_node_type == JSON_OBJECT_TYPE || next_node_type == JSON_ARRAY_TYPE) {
                     g_current_value = next_node_value;
                 }
-            } else if (cmd_list[0] == "ls") {
+            } else if (cmd_list[0] == "ls") { // 支持打印对应key或是index指向的值
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE || g_current_value.get_type() == JSON_ARRAY_TYPE) {
                     int arr_index = 0;
                     auto iter_begin = g_current_value.begin();
