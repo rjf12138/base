@@ -23,7 +23,7 @@ public:
     // 解析ByteBuffer保存的json文本
     int parser_from_json(ByteBuffer &buff);
     // 将json转换为文本输出
-    string generate_to_json(void);
+    string generate_to_json(bool is_format = true);
     
     // 下标访问json的对象
     ValueTypeCast& operator[](JsonIndex key);

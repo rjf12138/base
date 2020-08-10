@@ -102,7 +102,7 @@ MsgRecord::assemble_msg(void)
         ostr << "[" << level_convert(msg_info_[i].info_level) << "]  ";
         ostr << msg_info_[i].msg_info << std::endl;
     }
-    
+    msg_info_.clear();
     return ostr.str();
 }
 

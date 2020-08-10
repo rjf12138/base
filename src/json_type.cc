@@ -306,51 +306,6 @@ JsonType::get_json_text(ByteBuffer_Iterator &value_curr_pos, int range)
     return ostr.str();
 }
 
-string 
-JsonType::format_json(void)
-{
-    if (json_value_type_ == JSON_OBJECT_TYPE || json_value_type_ == JSON_ARRAY_TYPE){
-        string raw_json = this->generate();
-
-        int tab = 0;
-        ostringstream oformat_json;
-        for (std::size_t i = 0; i < raw_json.size(); ++i) {
-            if (raw_json[i] == '{' || raw_json[i] == '[') {
-                ++tab;
-                oformat_json << raw_json[i];
-                oformat_json << '\n';
-                for (int j = 0; j < tab; ++j) {
-                    oformat_json << '\t';
-                }
-                continue;
-            } else if (raw_json[i] == '}' || raw_json[i] == ']') {
-                oformat_json << '\n';
-                --tab;
-                for (int j = 0; j < tab; ++j) {
-                    oformat_json << '\t';
-                }
-                oformat_json << raw_json[i];
-                continue;
-            } else if (raw_json[i] == ',' && 
-                            (raw_json[i+1] == '"' || 
-                            raw_json[i+1] == '{' || 
-                            raw_json[i+1] == '[')) {
-                oformat_json << raw_json[i];
-                oformat_json << '\n';
-                for (int j = 0; j < tab; ++j) {
-                    oformat_json << '\t';
-                }
-                continue;
-            } else {
-                oformat_json << raw_json[i];
-            }
-        }
-        return oformat_json.str().c_str();
-    } else {
-        return this->generate();
-    }
-}
-
 string
 JsonType::debug_info(ByteBuffer_Iterator &value_curr_pos)
 {
@@ -1032,7 +987,7 @@ JsonArray::erase(JsonIndex &index)
     auto remove_iter = array_val_.begin();
     // 移动迭代器index个距离
     advance(remove_iter, index);
-    array_val_.erase(remove_iter, remove_iter);
+    array_val_.erase(remove_iter);
     
     return 1;
 }
@@ -1047,10 +1002,11 @@ ostream& operator<<(ostream &os, JsonArray &rhs)
 ValueTypeCast& 
 JsonArray::operator[](size_t key)
 {
-    if (key < 0 || key >= array_val_.size()-1) {
+    if (key < 0 || key >= array_val_.size()) {
         string err_str = get_msg("There is out of range in JsonArray with key(%s)", key);
         throw runtime_error(err_str);
     }
+
     return array_val_[key];
 }
 
@@ -1285,6 +1241,7 @@ ValueTypeCast ValueTypeCast::operator[](JsonIndex key)
         return json_object_value_[key];
     } else if (json_value_type_ == JSON_ARRAY_TYPE && 
             key.get_type() == JSON_NUMBER_TYPE) {
+                cout << "ValueTypeCast::operator[]: " << key << " size: " << json_array_value_.array_val_.size()<< endl;
         return json_array_value_[key];
     } else {
         string err_str = get_msg("Json: Out of range");
@@ -1316,6 +1273,52 @@ string ValueTypeCast::generate(void)
 
     return "";
 }
+
+string ValueTypeCast::format_json(void)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE || json_value_type_ == JSON_ARRAY_TYPE){
+        string raw_json = this->generate();
+
+        int tab = 0;
+        ostringstream oformat_json;
+        for (std::size_t i = 0; i < raw_json.size(); ++i) {
+            if (raw_json[i] == '{' || raw_json[i] == '[') {
+                ++tab;
+                oformat_json << raw_json[i];
+                oformat_json << '\n';
+                for (int j = 0; j < tab; ++j) {
+                    oformat_json << '\t';
+                }
+                continue;
+            } else if (raw_json[i] == '}' || raw_json[i] == ']') {
+                oformat_json << '\n';
+                --tab;
+                for (int j = 0; j < tab; ++j) {
+                    oformat_json << '\t';
+                }
+                oformat_json << raw_json[i];
+                continue;
+            } else if (raw_json[i] == ',' && 
+                            (raw_json[i+1] == '"' || 
+                            raw_json[i+1] == '{' || 
+                            raw_json[i+1] == '[')) {
+                oformat_json << raw_json[i];
+                oformat_json << '\n';
+                for (int j = 0; j < tab; ++j) {
+                    oformat_json << '\t';
+                }
+                continue;
+            } else {
+                oformat_json << raw_json[i];
+            }
+        }
+
+        return oformat_json.str().c_str();
+    } else {
+        return this->generate();
+    }
+}
+
 
 int ValueTypeCast::erase(JsonIndex index)
 {

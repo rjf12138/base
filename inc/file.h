@@ -18,12 +18,19 @@ public:
     // 根据文件描述符打开文件
     int set_fd(int fd, bool open_when_exit = true);
 
+    // 返回文件信息
     int fileinfo(struct stat &file_info);
+    // 返回文件的大小
     off_t file_size() {return file_info_.st_size;}
+    // 关闭文件
     int close_file(void);
+    // 检查文件描述符
     int check_fd(int fd);
+    // 错误打印
     void print_errno(void);
-
+    // 清空文件
+    void clear_file(void);
+    
     // 设置文件偏移
     off_t seek(off_t offset, int whence);
     // 返回当前位置

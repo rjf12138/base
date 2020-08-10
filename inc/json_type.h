@@ -95,14 +95,10 @@ public:
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos){return ByteBuffer_Iterator();}
     // 将json值反序列化为字符串输出， 没有格式化
     virtual string generate(void) { return "";}
-    // 格式化json字符串，方便阅读
-    virtual string format_json(void);
     // 获取以value_curr_pos为中心，range为半径范围的json值，主要为了调试用
     string get_json_text(ByteBuffer_Iterator &value_curr_pos, int range);
     // 输出调试信息
     virtual string debug_info(ByteBuffer_Iterator &value_curr_pos);
-private:
-    VALUE_TYPE json_value_type_;
 };
 
 // json 数值类型
@@ -270,7 +266,10 @@ public:
 
     ValueTypeCast operator[](JsonIndex key);
 
+    // 非格式化输出 json
     virtual string generate(void);
+    // 格式化输出 json
+    virtual string format_json(void);
     // 根据输入，自动解析并设置值
     bool parse(string input_str);
     VALUE_TYPE get_type(void) const {return json_value_type_;}

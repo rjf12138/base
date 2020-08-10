@@ -22,7 +22,7 @@ EnumOption parse_arg(string cmd);
 
 string g_json_file_path = "";
 WeJson g_json;
-ValueTypeCast g_current_value = JsonNull();
+ValueTypeCast &g_current_value = g_json.get_value();
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
 
     g_json_file_path = argv[argc-1];
     g_json.open_json(g_json_file_path);
-    g_current_value = g_json.get_value();
 
     string input;
     while (true) {
@@ -71,12 +70,6 @@ EnumOption parse_arg(string cmd)
     StrBuffer str(cmd);
     vector<string> cmd_list = str.split_str(" ");
 
-    cout << cmd_list.size() << endl;
-    for (auto iter = cmd_list.begin(); iter != cmd_list.end(); ++iter) {
-        cout << *iter << " ";
-    }
-    cout << endl;
-
     if (cmd_list.size() == 0) {
         return EOption_Error;
     }
@@ -87,7 +80,7 @@ EnumOption parse_arg(string cmd)
         }
         
         if (g_json_file_path != "") {
-            if (cmd_list[0] == "write") { // 存在问题不是覆盖写
+            if (cmd_list[0] == "write") {
                 g_json.write_json(g_json_file_path);
                 g_current_value = g_json.get_value();
             } else if (cmd_list[0] == "quit") {
@@ -110,7 +103,7 @@ EnumOption parse_arg(string cmd)
                         g_current_value.add(cmd_list[1], value);
                     }
                 }
-            } else if (cmd_list[0] == "del" && cmd_list.size() == 2) { //存在问题，没有删除
+            } else if (cmd_list[0] == "del" && cmd_list.size() == 2) { //存在问题，数组删除之后写入有问题
                 if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
                     g_current_value.erase(cmd_list[1]);
                 } else if (g_current_value.get_type() == JSON_ARRAY_TYPE) {

@@ -107,6 +107,16 @@ FileOperate::check_fd(int fd)
     return 0;
 }
 
+void 
+FileOperate::clear_file(void)
+{
+    ftruncate64(fd_, 0);
+    // 将文件偏移量设为0，防止出现文件空洞
+    this->seek(0, SEEK_SET);
+
+    return ;
+}
+
 off_t 
 FileOperate::seek(off_t offset, int whence)
 {
@@ -184,7 +194,7 @@ FileOperate::write(ByteBuffer &buff, size_t buf_size)
     size_t remain_size = buf_size;
     
     do {
-        size_t read_size = remain_size > 8192 ? tmp_buf_size : remain_size;
+        size_t read_size = remain_size > tmp_buf_size ? tmp_buf_size : remain_size;
         size_t ret_read_size = buff.read_bytes(buf, read_size);
 
         int ret = ::write(fd_, buf, ret_read_size);

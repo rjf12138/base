@@ -43,6 +43,7 @@ WeJson::write_json(string json_file_path)
 
     ByteBuffer buff;
     buff.write_bytes(this->generate_to_json().c_str(), this->generate_to_json().length());
+    json_file.clear_file();
     json_file.write(buff, buff.data_size());
 
     return 0;
@@ -136,9 +137,9 @@ WeJson::operator[](JsonIndex key)
 }
 
 string 
-WeJson::generate_to_json(void)
+WeJson::generate_to_json(bool is_format)
 {
-    return json_value_.generate();
+    return is_format ? json_value_.format_json() : json_value_.generate();
 }
 
 }
