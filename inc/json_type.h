@@ -270,8 +270,7 @@ public:
     virtual string generate(void);
     // 格式化输出 json
     virtual string format_json(void);
-    // 根据输入，自动解析并设置值
-    bool parse(string input_str);
+    
     VALUE_TYPE get_type(void) const {return json_value_type_;}
     
     // 只有Json的数组或对象类型支持

@@ -42,7 +42,7 @@ WeJson::write_json(string json_file_path)
     }
 
     ByteBuffer buff;
-    buff.write_bytes(this->generate_to_json().c_str(), this->generate_to_json().length());
+    buff.write_bytes(this->format_json().c_str(), this->format_json().length());
     json_file.clear_file();
     json_file.write(buff, buff.data_size());
 
@@ -103,43 +103,19 @@ WeJson::parser_from_json(ByteBuffer &buff)
     auto begin_json = simple_json_text.begin();
     auto end_json = simple_json_text.end();
 
-    VALUE_TYPE ret_type = JsonType::check_value_type(begin_json);
+    VALUE_TYPE ret_type = this->check_value_type(begin_json);
     if (ret_type == JSON_ARRAY_TYPE) {
-        json_value_.json_array_value_.parse(begin_json, end_json);
-        json_value_.json_value_type_ = JSON_ARRAY_TYPE;
+        json_array_value_.parse(begin_json, end_json);
+        json_value_type_ = JSON_ARRAY_TYPE;
     } else if (ret_type == JSON_OBJECT_TYPE) {
-        json_value_.json_object_value_.parse(begin_json, end_json);
-        json_value_.json_value_type_ = JSON_OBJECT_TYPE;
+        json_object_value_.parse(begin_json, end_json);
+        json_value_type_ = JSON_OBJECT_TYPE;
     } else {
         string err_str = get_msg("Unknown json type (object or array)");
         throw runtime_error(err_str);
     }
 
     return 0;
-}
-
-ValueTypeCast& 
-WeJson::operator[](JsonIndex key)
-{
-    if (json_value_.json_value_type_ == JSON_OBJECT_TYPE && 
-            key.get_type() == JSON_STRING_TYPE) {
-        return json_value_.json_object_value_[key];
-    } else if (json_value_.json_value_type_ == JSON_ARRAY_TYPE && 
-            key.get_type() == JSON_NUMBER_TYPE) {
-        return json_value_.json_array_value_[key];
-    } else {
-        string err_str = get_msg("Json: Out of range");
-        throw runtime_error(err_str);
-    }
-    
-    json_value_.json_value_type_ = JSON_NULL_TYPE;
-    return json_value_;
-}
-
-string 
-WeJson::generate_to_json(bool is_format)
-{
-    return is_format ? json_value_.format_json() : json_value_.generate();
 }
 
 }

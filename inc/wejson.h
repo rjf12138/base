@@ -8,7 +8,7 @@
 
 namespace my_util {
 
-class WeJson : public MsgRecord {
+class WeJson : public ValueTypeCast {
 public:
     WeJson(void);
     WeJson(string str);
@@ -22,21 +22,11 @@ public:
     int parser_from_json(string str);
     // 解析ByteBuffer保存的json文本
     int parser_from_json(ByteBuffer &buff);
-    // 将json转换为文本输出
-    string generate_to_json(bool is_format = true);
-    
-    // 下标访问json的对象
-    ValueTypeCast& operator[](JsonIndex key);
-    // 获取解析的json类型（数组或是对象）
-    VALUE_TYPE get_type(void) const {return json_value_.get_type();}
-    // 获取json_value
-    ValueTypeCast& get_value(void) {return json_value_;}
 
     // 当出错时输出调试信息
     string debug_info(void);
 
 public:
-    ValueTypeCast json_value_;
     // json中重要的分割字符
     const vector<char> sperate_chars = {' ', '\r', '\n','\t','{', '}','[', ']',',',':','"'};
 };
