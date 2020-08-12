@@ -193,8 +193,12 @@ public:
     virtual string generate(void) override;
 
     // 操作元素
-    int add(JsonIndex &key, const ValueTypeCast &value);
     int erase(JsonIndex &key);
+    // 当前类型为对象时添加元素
+    int add(JsonIndex key, ValueTypeCast value);
+    int add(JsonIndex key, string value);
+    int add(JsonIndex key, bool value);
+    int add(JsonIndex key, JsonNumber value);
 
     // 重载操作符
     bool operator==(const JsonObject& rhs) const;
@@ -217,9 +221,13 @@ public:
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
     virtual string generate(void) override;
 
-    // 操作元素
-    int add(const ValueTypeCast &value);
-    int erase(JsonIndex &index);
+    // 数组或是对象删除元素
+    int erase(JsonIndex index);
+    // 当前添加元素
+    int add(ValueTypeCast value);
+    int add(string value);
+    int add(bool value);
+    int add(JsonNumber value);
 
     // 重载操作符
     ValueTypeCast& operator[](size_t key);
@@ -277,18 +285,6 @@ public:
     // 返回数组或是对象的起始和结束迭代器
     JsonIter begin(void);
     JsonIter end(void);
-    // 数组或是对象删除元素
-    int erase(JsonIndex index);
-    // 当前类型为数组时添加元素
-    int add(ValueTypeCast value);
-    int add(string value);
-    int add(bool value);
-    int add(JsonNumber value);
-    // 当前类型为对象时添加元素
-    int add(JsonIndex key, ValueTypeCast value);
-    int add(JsonIndex key, string value);
-    int add(JsonIndex key, bool value);
-    int add(JsonIndex key, JsonNumber value);
 
 public:
     VALUE_TYPE json_value_type_;

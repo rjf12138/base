@@ -24,6 +24,35 @@ string g_json_file_path = "";
 WeJson g_json;
 ValueTypeCast &g_current_value = g_json;
 
+class ManagerJson {
+public:
+    int cd(string node_name) {
+        if (current_path == -1) {
+            return -1;
+        }
+        if (node_name == "..") {
+            current_path == 0 ? 0 : --current_path;
+        }
+
+        if (node_name == ".")
+        {
+
+        }
+
+        
+        for (auto iter = json_.begin(); iter != json_.end(); ++iter) {
+
+        }
+
+    }
+
+private:
+    WeJson json_;
+    vector<string> path_;
+    int current_path = -1;
+};
+
+
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
