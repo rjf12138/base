@@ -25,7 +25,11 @@ JsonIndex::JsonIndex(const string &key)
    index_(0),
    key_(key)
    {}
-
+JsonIndex::JsonIndex(const char *key)
+ : index_type_(JSON_STRING_TYPE),
+   index_(0),
+   key_(key)
+   {}
 JsonIndex::~JsonIndex(void)
 {
 }
@@ -224,21 +228,25 @@ JsonIter::operator--(int)
     return tmp;
 }
 
-pair<string, ValueTypeCast>
+pair<string, ValueTypeCast&>
 JsonIter::operator*()
 {
-    pair<string, ValueTypeCast> ret;
     if (iter_type_ == JSON_OBJECT_TYPE) {
-        ret = *obj_iter_;
+        pair<string, ValueTypeCast&> ret(obj_iter_->first, obj_iter_->second);
+        return ret;
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
-        ret.first = "";
-        ret.second = *arr_iter_;
+        pair<string, ValueTypeCast&> ret("", *arr_iter_);
+        return ret;
     } else {
         string err_str = get_msg("unknown type: call JsonIter::operator*() failed!");
         throw runtime_error(err_str);
     }
+}
 
-    return ret;
+pair<string, ValueTypeCast&> *
+JsonIter::operator->()
+{
+    return & this->operator*();
 }
 
 /////////////////////////////////////////////////////////
@@ -800,6 +808,13 @@ JsonObject::generate(void)
     return output_obj.str();
 }
 
+JsonIter
+JsonObject::find(const string &key)
+{
+    auto iter = object_val_.find(key);
+    return iter;
+}
+
 int
 JsonObject::erase(JsonIndex &index)
 {
@@ -807,27 +822,6 @@ JsonObject::erase(JsonIndex &index)
 }
 
 int JsonObject::add(JsonIndex key, ValueTypeCast value)
-{
-    object_val_[key] = value;
-
-    return 1;
-}
-
-int JsonObject::add(JsonIndex key, string value)
-{
-    JsonString js(value);
-    object_val_[key] = js;
-
-    return 1;
-}
-int JsonObject::add(JsonIndex key, bool value)
-{
-    JsonBool jb(value);
-    object_val_[key] = jb;
-
-    return 1;
-}
-int JsonObject::add(JsonIndex key, JsonNumber value)
 {
     object_val_[key] = value;
 
@@ -995,29 +989,6 @@ JsonArray::generate(void)
 
 
 int JsonArray::add(ValueTypeCast value)
-{
-    array_val_.push_back(value);
-
-    return 1;
-}
-
-int JsonArray::add(string value)
-{
-    JsonString js(value);
-    array_val_.push_back(js);
-
-    return 1;
-}
-
-int JsonArray::add(bool value)
-{
-    JsonBool jb(value);
-    array_val_.push_back(jb);
-
-    return 1;
-}
-
-int JsonArray::add(JsonNumber value)
 {
     array_val_.push_back(value);
 
@@ -1361,6 +1332,82 @@ string ValueTypeCast::format_json(void)
         return this->generate();
     }
 }
+
+// 查找元素
+JsonIter 
+ValueTypeCast::find(const string &key)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.find(key);
+    }
+
+    throw runtime_error(get_msg("Not support find function!"));
+    return json_object_value_.object_val_.end();
+}
+// 操作元素
+int ValueTypeCast::erase(JsonIndex key)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.erase(key);
+    } else if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.erase(key);
+    }
+
+    throw runtime_error(get_msg("Not support erase function!"));
+    return -1;
+}
+
+// 当前类型为对象时添加元素
+int ValueTypeCast::add(JsonIndex key, ValueTypeCast value)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.add(key, value);
+    } else if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.add(value);
+    }
+
+    throw runtime_error(get_msg("Not support add function!"));
+    return -1;
+}
+
+int ValueTypeCast::add(JsonIndex key, string value)
+{
+    JsonString val(value);
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.add(key, val);
+    } else if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.add(val);
+    }
+
+    throw runtime_error(get_msg("Not support add function!"));
+    return -1;
+}
+
+int ValueTypeCast::add(JsonIndex key, bool value)
+{
+    JsonBool val(value);
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.add(key, val);
+    } else if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.add(val);
+    }
+
+    throw runtime_error(get_msg("Not support add function!"));
+    return -1;
+}
+
+int ValueTypeCast::add(JsonIndex key, JsonNumber value)
+{
+    if (json_value_type_ == JSON_OBJECT_TYPE) {
+        return json_object_value_.add(key, value);
+    } else if (json_value_type_ == JSON_ARRAY_TYPE) {
+        return json_array_value_.add(value);
+    }
+
+    throw runtime_error(get_msg("Not support add function!"));
+    return -1;
+}
+
 
 JsonIter 
 ValueTypeCast::begin(void)

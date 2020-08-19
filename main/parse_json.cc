@@ -22,35 +22,39 @@ EnumOption parse_arg(string cmd);
 
 string g_json_file_path = "";
 WeJson g_json;
-ValueTypeCast &g_current_value = g_json;
+JsonIter g_current_value;
 
-class ManagerJson {
-public:
-    int cd(string node_name) {
-        if (current_path == -1) {
-            return -1;
-        }
-        if (node_name == "..") {
-            current_path == 0 ? 0 : --current_path;
-        }
+// class ManagerJson {
+// public:
+//     ValueTypeCast& cd(string node_name) {
+//         if (current_path == -1) {
+//             return json_;
+//         }
+//         if (node_name == "..") {
+//             current_path == 0 ? 0 : --current_path;
+//         }
 
-        if (node_name == ".")
-        {
-
-        }
+//         if (node_name == "/")
+//         {
+//             return json_;
+//         }
 
         
-        for (auto iter = json_.begin(); iter != json_.end(); ++iter) {
+//         auto g_node = json_;
+//         while (true) {
+            
+//             if (current_path < path_.size()-1) {
+                
+//             }
+//         }
 
-        }
+//     }
 
-    }
-
-private:
-    WeJson json_;
-    vector<string> path_;
-    int current_path = -1;
-};
+// private:
+//     WeJson json_;
+//     vector<string> path_;
+//     int current_path = -1;
+// };
 
 
 int main(int argc, char *argv[])
@@ -62,6 +66,7 @@ int main(int argc, char *argv[])
 
     g_json_file_path = argv[argc-1];
     g_json.open_json(g_json_file_path);
+    g_current_value = g_json.begin();
 
     string input;
     while (true) {
@@ -111,50 +116,50 @@ EnumOption parse_arg(string cmd)
         if (g_json_file_path != "") {
             if (cmd_list[0] == "write") {
                 g_json.write_json(g_json_file_path);
-                g_current_value = g_json;
+                g_current_value = g_json.begin();
             } else if (cmd_list[0] == "quit") {
                 return EOption_Quit;
             } else if (cmd_list[0] == "mod") {
                 // to-do
             } else if (cmd_list[0] == "add") { // 存在问题，要改成绝对路径的值
-                if (g_current_value.get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 3) {
+                if (g_current_value->second.get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 3) {
                     if (cmd_list[2][0] == '"') {
-                        g_current_value.add(cmd_list[1], cmd_list[2]);
+                        g_current_value->second.add(cmd_list[1], cmd_list[2]);
                     } else {
                         double value = stod(cmd_list[2]);
-                        g_current_value.add(cmd_list[1], value);
+                        g_current_value->second.add(cmd_list[1], value);
                     }
-                } else if (g_current_value.get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 2) {
+                } else if (g_current_value->second.get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 2) {
                     if (cmd_list[2][0] == '"') {
-                        g_current_value.add(cmd_list[1], cmd_list[2]);
+                        g_current_value->second.add(cmd_list[1], cmd_list[2]);
                     } else {
                         double value = stod(cmd_list[2]);
-                        g_current_value.add(cmd_list[1], value);
+                        g_current_value->second.add(cmd_list[1], value);
                     }
                 }
             } else if (cmd_list[0] == "del" && cmd_list.size() == 2) { //存在问题，改成绝对路径，比如删除 /friends/0/id 对应的值
-                if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
-                    g_current_value.erase(cmd_list[1]);
-                } else if (g_current_value.get_type() == JSON_ARRAY_TYPE) {
-                    g_current_value.erase(stoi(cmd_list[1]));
+                if (g_current_value->second.get_type() == JSON_OBJECT_TYPE) {
+                    g_current_value->second.erase(cmd_list[1]);
+                } else if (g_current_value->second.get_type() == JSON_ARRAY_TYPE) {
+                    g_current_value->second.erase(stoi(cmd_list[1]));
                 }
             } else if (cmd_list[0] == "cd" && cmd_list.size() == 2) { // 无法进入关键字中带有空格的类型, 无法回到上级目录
-                if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
-                    g_current_value = g_current_value[cmd_list[1]];
-                } else if (g_current_value.get_type() == JSON_ARRAY_TYPE) {
-                    g_current_value = g_current_value[stoi(cmd_list[1])];
+                if (g_current_value->second.get_type() == JSON_OBJECT_TYPE) {
+                    g_current_value = g_current_value->second.begin();
+                } else if (g_current_value->second.get_type() == JSON_ARRAY_TYPE) {
+                    g_current_value = g_current_value->second.begin();
                 }
             } else if (cmd_list[0] == "ls") { // 支持打印对应key或是index指向的值
-                if (g_current_value.get_type() == JSON_OBJECT_TYPE || g_current_value.get_type() == JSON_ARRAY_TYPE) {
+                if (g_current_value->second.get_type() == JSON_OBJECT_TYPE || g_current_value->second.get_type() == JSON_ARRAY_TYPE) {
                     int arr_index = 0;
-                    auto iter_begin = g_current_value.begin();
-                    auto iter_end = g_current_value.end();
+                    auto iter_begin = g_current_value->second.begin();
+                    auto iter_end = g_current_value->second.end();
                     for (auto iter = iter_begin; iter != iter_end; ++iter) {
                         auto tmp = *iter;
 
-                        if (g_current_value.get_type() == JSON_OBJECT_TYPE) {
+                        if (g_current_value->second.get_type() == JSON_OBJECT_TYPE) {
                             cout << " " << tmp.first;
-                        } else if (g_current_value.get_type() == JSON_ARRAY_TYPE) {
+                        } else if (g_current_value->second.get_type() == JSON_ARRAY_TYPE) {
                             cout << " " << arr_index++;
                         }
 

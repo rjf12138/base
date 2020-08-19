@@ -31,6 +31,7 @@ public:
     JsonIndex(const uint32_t &index);
     JsonIndex(const int32_t &index);
     JsonIndex(const string &key);
+    JsonIndex(const char *key);
     ~JsonIndex(void);
 
     operator uint32_t();
@@ -76,7 +77,8 @@ public:
     // 后置 --
     JsonIter operator--(int);
     // 进行取值时，数组和对象都返回一个pair,数组的first是下标，对象的first是key
-    pair<string, ValueTypeCast> operator*();
+    pair<string, ValueTypeCast&> operator*();
+    pair<string, ValueTypeCast&>* operator->();
 
 
     VALUE_TYPE get_iter_type() const {return iter_type_;}
@@ -192,13 +194,14 @@ public:
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
     virtual string generate(void) override;
 
+    // 元素数量
+    int size(void) const {return object_val_.size();};
+    // 查找元素
+    JsonIter find(const string &key);
     // 操作元素
     int erase(JsonIndex &key);
     // 当前类型为对象时添加元素
     int add(JsonIndex key, ValueTypeCast value);
-    int add(JsonIndex key, string value);
-    int add(JsonIndex key, bool value);
-    int add(JsonIndex key, JsonNumber value);
 
     // 重载操作符
     bool operator==(const JsonObject& rhs) const;
@@ -221,13 +224,12 @@ public:
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
     virtual string generate(void) override;
 
+    // 元素数量
+    int size(void) const {return array_val_.size();};
     // 数组或是对象删除元素
     int erase(JsonIndex index);
     // 当前添加元素
     int add(ValueTypeCast value);
-    int add(string value);
-    int add(bool value);
-    int add(JsonNumber value);
 
     // 重载操作符
     ValueTypeCast& operator[](size_t key);
@@ -243,6 +245,8 @@ public:
 // json中转类型：可以安装当前存储的类型输出或是接收不同的类型
 class ValueTypeCast : public JsonType {
     friend ostream& operator<<(ostream &os, ValueTypeCast &rhs);
+    friend JsonObject;
+    friend JsonArray;
 public:
     ValueTypeCast(void);
     ValueTypeCast(JsonBool value);
@@ -278,6 +282,16 @@ public:
     virtual string generate(void);
     // 格式化输出 json
     virtual string format_json(void);
+
+    // 查找元素
+    JsonIter find(const string &key);
+    // 操作元素
+    int erase(JsonIndex key);
+    // 当前类型为对象时添加元素
+    int add(JsonIndex key, ValueTypeCast value);
+    int add(JsonIndex key, string value);
+    int add(JsonIndex key, bool value);
+    int add(JsonIndex key, JsonNumber value);
     
     VALUE_TYPE get_type(void) const {return json_value_type_;}
     
@@ -286,7 +300,7 @@ public:
     JsonIter begin(void);
     JsonIter end(void);
 
-public:
+private:
     VALUE_TYPE json_value_type_;
     JsonArray json_array_value_;
     JsonObject json_object_value_;
