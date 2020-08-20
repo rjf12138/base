@@ -76,15 +76,16 @@ public:
     JsonIter& operator--(void);
     // 后置 --
     JsonIter operator--(int);
-    // 进行取值时，数组和对象都返回一个pair,数组的first是下标，对象的first是key
-    pair<string, ValueTypeCast&> operator*();
-    pair<string, ValueTypeCast&>* operator->();
 
+    // 访问当前迭代器的值，数组first返回""
+    string first();
+    ValueTypeCast& second();
 
     VALUE_TYPE get_iter_type() const {return iter_type_;}
 
 private:
     VALUE_TYPE iter_type_; // 只能是字符串型和数字型
+    pair<string, ValueTypeCast*> ret_;
     ObjIter obj_iter_;
     ArrIter arr_iter_;
 };
@@ -278,6 +279,8 @@ public:
 
     ValueTypeCast operator[](JsonIndex key);
 
+    // 解析json类型
+    virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos);
     // 非格式化输出 json
     virtual string generate(void);
     // 格式化输出 json

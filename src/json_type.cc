@@ -228,25 +228,29 @@ JsonIter::operator--(int)
     return tmp;
 }
 
-pair<string, ValueTypeCast&>
-JsonIter::operator*()
+string
+JsonIter::first()
 {
     if (iter_type_ == JSON_OBJECT_TYPE) {
-        pair<string, ValueTypeCast&> ret(obj_iter_->first, obj_iter_->second);
-        return ret;
+        return obj_iter_->first;
     } else if (iter_type_ == JSON_ARRAY_TYPE) {
-        pair<string, ValueTypeCast&> ret("", *arr_iter_);
-        return ret;
+        return "";
     } else {
         string err_str = get_msg("unknown type: call JsonIter::operator*() failed!");
         throw runtime_error(err_str);
     }
 }
-
-pair<string, ValueTypeCast&> *
-JsonIter::operator->()
+ValueTypeCast& 
+JsonIter::second()
 {
-    return & this->operator*();
+    if (iter_type_ == JSON_OBJECT_TYPE) {
+        return obj_iter_->second;
+    } else if (iter_type_ == JSON_ARRAY_TYPE) {
+        return *arr_iter_;
+    } else {
+        string err_str = get_msg("unknown type: call JsonIter::operator*() failed!");
+        throw runtime_error(err_str);
+    }
 }
 
 /////////////////////////////////////////////////////////
@@ -1263,6 +1267,32 @@ ValueTypeCast ValueTypeCast::operator[](JsonIndex key)
     }
     
     return json_null_value_;
+}
+
+ByteBuffer_Iterator 
+ValueTypeCast::parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos)
+{
+    VALUE_TYPE ret_type = this->check_value_type(value_start_pos);
+    json_value_type_ = ret_type;
+    switch (ret_type)
+    {
+    case JSON_NULL_TYPE:
+        return json_null_value_.parse(value_start_pos, json_end_pos);
+    case JSON_NUMBER_TYPE:
+        return json_number_value_.parse(value_start_pos, json_end_pos);
+    case JSON_STRING_TYPE:
+        return json_string_value_.parse(value_start_pos, json_end_pos);
+    case JSON_BOOL_TYPE:
+        return json_bool_value_.parse(value_start_pos, json_end_pos);
+    case JSON_ARRAY_TYPE:
+        return json_array_value_.parse(value_start_pos, json_end_pos);
+    case  JSON_OBJECT_TYPE:
+        return json_object_value_.parse(value_start_pos, json_end_pos);
+    default:
+        string err_str = get_msg("Unknown json type (object or array)");
+        throw runtime_error(err_str);
+        break;
+    }
 }
 
 string ValueTypeCast::generate(void)

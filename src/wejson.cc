@@ -103,17 +103,18 @@ WeJson::parser_from_json(ByteBuffer &buff)
     auto begin_json = simple_json_text.begin();
     auto end_json = simple_json_text.end();
 
-    VALUE_TYPE ret_type = this->check_value_type(begin_json);
-    if (ret_type == JSON_ARRAY_TYPE) {
-        json_array_value_.parse(begin_json, end_json);
-        json_value_type_ = JSON_ARRAY_TYPE;
-    } else if (ret_type == JSON_OBJECT_TYPE) {
-        json_object_value_.parse(begin_json, end_json);
-        json_value_type_ = JSON_OBJECT_TYPE;
-    } else {
-        string err_str = get_msg("Unknown json type (object or array)");
-        throw runtime_error(err_str);
-    }
+    this->parse(begin_json, end_json);
+    // VALUE_TYPE ret_type = this->check_value_type(begin_json);
+    // if (ret_type == JSON_ARRAY_TYPE) {
+    //     json_array_value_.parse(begin_json, end_json);
+    //     json_value_type_ = JSON_ARRAY_TYPE;
+    // } else if (ret_type == JSON_OBJECT_TYPE) {
+    //     json_object_value_.parse(begin_json, end_json);
+    //     json_value_type_ = JSON_OBJECT_TYPE;
+    // } else {
+    //     string err_str = get_msg("Unknown json type (object or array)");
+    //     throw runtime_error(err_str);
+    // }
 
     return 0;
 }
