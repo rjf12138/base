@@ -22,7 +22,7 @@ EnumOption parse_arg(string cmd);
 
 string g_json_file_path = "";
 WeJson g_json;
-JsonIter g_current_value;
+ValueTypeCast *g_current_value;
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
     g_json_file_path = argv[argc-1];
     g_json.open_json(g_json_file_path);
-    g_current_value = g_json.begin();
+    g_current_value = &g_json;
 
     string input;
     while (true) {
@@ -57,7 +57,7 @@ void help_info(void)
     cout << "   write                       # 将内存中的数据写入到文件中" << endl;
     cout << "   quit                        # 退出json文件编辑模式" << endl;
     cout << "   set   key/index   value     # 给key设置新值, 不存在打印failed" << endl;
-    cout << "   add   key         value     # 添加新的值，数组的话不考虑index直接将值添加到最后" << endl;
+    cout << "   add   type key    value     # 添加新的值，数组的话不考虑index直接将值添加到最后,type: str, num, bool, null" << endl;
     cout << "   del   key/index             # 删除key/index对应的元素" << endl;
     cout << "   cd    key/index             # key是数组或是对象时，可以进入" << endl;
     cout << "   ls                          # 打印当前对象/数组中的元素, 不存在返回 \"\"" << endl;
@@ -83,47 +83,48 @@ EnumOption parse_arg(string cmd)
         if (g_json_file_path != "") {
             if (cmd_list[0] == "write") {
                 g_json.write_json(g_json_file_path);
-                g_current_value = g_json.begin();
+                g_current_value = &g_json;
             } else if (cmd_list[0] == "quit") {
                 return EOption_Quit;
             } else if (cmd_list[0] == "mod") {
                 // to-do
             } else if (cmd_list[0] == "add") { // 不能添加数组和对象， 格式转换又问题
-                if (g_current_value.second().get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 3) {
-                    if (cmd_list[2][0] == '"') {
-                        g_current_value.second().add(cmd_list[1], cmd_list[2]);
-                    } else {
-                        double value = stod(cmd_list[2]);
-                        g_current_value.second().add(cmd_list[1], value);
+                if (g_current_value->get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 4) {
+                    if (cmd_list[1] == "str") {
+                        g_current_value->add(cmd_list[2], cmd_list[3]);
+                    } else if (cmd_list[1] == "num"){
+                        double value = stod(cmd_list[3]);
+                        g_current_value->add(cmd_list[2], value);
                     }
-                } else if (g_current_value.second().get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 2) {
-                    if (cmd_list[2][0] == '"') {
-                        g_current_value.second().add(cmd_list[1], cmd_list[2]);
-                    } else {
+                } else if (g_current_value->get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 3) {
+                    if (cmd_list[1] == "str") {
+                        g_current_value->add(cmd_list[1], cmd_list[2]);
+                    } else if (cmd_list[1] == "num"){
                         double value = stod(cmd_list[2]);
-                        g_current_value.second().add(cmd_list[1], value);
+                        g_current_value->add(cmd_list[1], value);
                     }
                 }
             } else if (cmd_list[0] == "del" && cmd_list.size() == 2) {
-                if (g_current_value.second().get_type() == JSON_OBJECT_TYPE) {
-                    g_current_value.second().erase(cmd_list[1]);
-                } else if (g_current_value.second().get_type() == JSON_ARRAY_TYPE) {
-                    g_current_value.second().erase(stoi(cmd_list[1]));
+                if (g_current_value->get_type() == JSON_OBJECT_TYPE) {
+                    g_current_value->erase(cmd_list[1]);
+                } else if (g_current_value->get_type() == JSON_ARRAY_TYPE) {
+                    g_current_value->erase(stoi(cmd_list[1]));
                 }
             } else if (cmd_list[0] == "cd" && cmd_list.size() == 2) {
-                VALUE_TYPE val_type = g_current_value.second().get_type();
+                VALUE_TYPE val_type = g_current_value->get_type();
                 if (val_type == JSON_OBJECT_TYPE || val_type == JSON_ARRAY_TYPE) {
-                    g_current_value = g_current_value.second().begin();
+                    g_current_value = &(*g_current_value)[cmd_list[1]];
                 }
             } else if (cmd_list[0] == "ls") { // 支持打印对应key或是index指向的值
-                if (g_current_value.second().get_type() == JSON_OBJECT_TYPE || g_current_value.second().get_type() == JSON_ARRAY_TYPE) {
+                cout << "current_type: " << g_current_value->get_type() << endl;
+                if (g_current_value->get_type() == JSON_OBJECT_TYPE || g_current_value->get_type() == JSON_ARRAY_TYPE) {
                     int arr_index = 0;
-                    auto iter_begin = g_current_value.second().begin();
-                    auto iter_end = g_current_value.second().end();
+                    auto iter_begin = g_current_value->begin();
+                    auto iter_end = g_current_value->end();
                     for (auto iter = iter_begin; iter != iter_end; ++iter) {
-                        if (g_current_value.second().get_type() == JSON_OBJECT_TYPE) {
+                        if (g_current_value->get_type() == JSON_OBJECT_TYPE) {
                             cout << " " << iter.first();
-                        } else if (g_current_value.second().get_type() == JSON_ARRAY_TYPE) {
+                        } else if (g_current_value->get_type() == JSON_ARRAY_TYPE) {
                             cout << " " << arr_index++;
                         }
 

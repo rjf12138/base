@@ -22,5 +22,6 @@
           "name": "Shanna Johns"
         }
       ],
-    "test": "test hell"
+    "test": "test hell",
+    "bool_val":true
 }

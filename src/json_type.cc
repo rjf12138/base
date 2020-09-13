@@ -339,7 +339,6 @@ JsonNumber::JsonNumber(double val)
   double_value_(val),
   int_value_(0)
 {
-    std::cout << "constru: " << double_value_ << " param_val: " << val << std::endl;
 }
 JsonNumber::JsonNumber(int32_t val)
 : value_type_(INT32_TYPE), 
@@ -411,9 +410,7 @@ JsonNumber::generate(void)
     {
     case DOUBLE_TYPE:
     {
-        std::cout << "double_value: " << double_value_ << std::endl;
         os << double_value_;
-        std::cout << "double_str_value: " << os.str().c_str() << std::endl;
     } break;
     case INT32_TYPE:
     {
@@ -627,6 +624,7 @@ JsonNull::operator=(JsonNull rhs)
 
 JsonString::JsonString(void) {}
 JsonString::JsonString(string val): value_(val) {}
+JsonString::JsonString(const char *val): value_(val) {};
 JsonString::~JsonString(void) {}
 
 ByteBuffer_Iterator 
@@ -872,9 +870,9 @@ JsonObject::operator!=(const JsonObject& rhs) const
 }
 
 ValueTypeCast& 
-JsonObject::operator[](string key)
+JsonObject::operator[](const JsonIndex &key)
 {
-    auto iter = object_val_.find(key);
+    auto iter = object_val_.find();
     if (iter == object_val_.end()) {
         string err_str = get_msg("Can't find value in JsonObject with key(%s)", key.c_str());
         throw runtime_error(err_str);
@@ -1252,7 +1250,7 @@ bool ValueTypeCast::operator!=(const ValueTypeCast& rhs) const
     return !(*this == rhs);
 }
 
-ValueTypeCast ValueTypeCast::operator[](JsonIndex key)
+ValueTypeCast ValueTypeCast::operator[](const JsonIndex &key)
 {
     if (json_value_type_ == JSON_OBJECT_TYPE && 
             key.get_type() == JSON_STRING_TYPE) {
@@ -1400,7 +1398,7 @@ int ValueTypeCast::add(JsonIndex key, ValueTypeCast value)
     return -1;
 }
 
-int ValueTypeCast::add(JsonIndex key, string value)
+int ValueTypeCast::add(JsonIndex key, JsonString value)
 {
     JsonString val(value);
     if (json_value_type_ == JSON_OBJECT_TYPE) {
@@ -1413,7 +1411,7 @@ int ValueTypeCast::add(JsonIndex key, string value)
     return -1;
 }
 
-int ValueTypeCast::add(JsonIndex key, bool value)
+int ValueTypeCast::add(JsonIndex key, JsonBool value)
 {
     JsonBool val(value);
     if (json_value_type_ == JSON_OBJECT_TYPE) {

@@ -131,8 +131,8 @@ private:
 class JsonBool : public JsonType {
     friend ostream& operator<<(ostream &os, JsonBool &rhs);
 public:
-    JsonBool(void);
-    JsonBool(bool val);
+    explicit JsonBool(void);
+    explicit JsonBool(bool val);
     ~JsonBool(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
@@ -150,8 +150,8 @@ private:
 class JsonNull : public JsonType {
     friend ostream& operator<<(ostream &os, JsonNull &rhs);
 public:
-    JsonNull(void);
-    JsonNull(string val);
+    explicit JsonNull(void);
+    explicit JsonNull(string val);
     ~JsonNull(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
@@ -171,6 +171,7 @@ class JsonString : public JsonType {
 public:
     JsonString(void);
     JsonString(string val);
+    JsonString(const char *val);
     ~JsonString(void);
 
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos) override;
@@ -188,7 +189,7 @@ private:
 class JsonObject : public JsonType {
     friend ostream& operator<<(ostream &os, JsonObject &rhs);
 public:
-    JsonObject(void);
+    explicit JsonObject(void);
     ~JsonObject(void);
 
     // 序列化和反序列化
@@ -218,7 +219,7 @@ public:
 class JsonArray : public JsonType {
     friend ostream& operator<<(ostream &os, JsonArray &rhs);
 public:
-    JsonArray(void);
+    explicit JsonArray(void);
     ~JsonArray(void);
 
     // 序列化和反序列化
@@ -277,7 +278,7 @@ public:
     bool operator==(const ValueTypeCast& rhs) const;
     bool operator!=(const ValueTypeCast& rhs) const;
 
-    ValueTypeCast operator[](JsonIndex key);
+    ValueTypeCast operator[](const JsonIndex &key);
 
     // 解析json类型
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos);
@@ -292,8 +293,8 @@ public:
     int erase(JsonIndex key);
     // 当前类型为对象时添加元素
     int add(JsonIndex key, ValueTypeCast value);
-    int add(JsonIndex key, string value);
-    int add(JsonIndex key, bool value);
+    int add(JsonIndex key, JsonString value);
+    int add(JsonIndex key, JsonBool value);
     int add(JsonIndex key, JsonNumber value);
     
     VALUE_TYPE get_type(void) const {return json_value_type_;}
