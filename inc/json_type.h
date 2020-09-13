@@ -209,7 +209,7 @@ public:
     bool operator==(const JsonObject& rhs) const;
     bool operator!=(const JsonObject& rhs) const;
     JsonObject& operator=(JsonObject rhs);
-    ValueTypeCast& operator[](string key);
+    ValueTypeCast& operator[](const JsonIndex &key);
 
 public:
     map<string, ValueTypeCast> object_val_;
