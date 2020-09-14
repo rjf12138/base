@@ -870,9 +870,9 @@ JsonObject::operator!=(const JsonObject& rhs) const
 }
 
 ValueTypeCast& 
-JsonObject::operator[](const JsonIndex &key)
+JsonObject::operator[](const string &key)
 {
-    auto iter = object_val_.find();
+    auto iter = object_val_.find(key);
     if (iter == object_val_.end()) {
         string err_str = get_msg("Can't find value in JsonObject with key(%s)", key.c_str());
         throw runtime_error(err_str);
@@ -1250,7 +1250,7 @@ bool ValueTypeCast::operator!=(const ValueTypeCast& rhs) const
     return !(*this == rhs);
 }
 
-ValueTypeCast ValueTypeCast::operator[](const JsonIndex &key)
+ValueTypeCast& ValueTypeCast::operator[](JsonIndex key)
 {
     if (json_value_type_ == JSON_OBJECT_TYPE && 
             key.get_type() == JSON_STRING_TYPE) {
@@ -1263,8 +1263,6 @@ ValueTypeCast ValueTypeCast::operator[](const JsonIndex &key)
         string err_str = get_msg("Json: Out of range");
         throw runtime_error(err_str);
     }
-    
-    return json_null_value_;
 }
 
 ByteBuffer_Iterator 

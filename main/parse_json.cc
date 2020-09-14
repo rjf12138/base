@@ -56,8 +56,9 @@ void help_info(void)
     cout << "   help                        # 打印帮助信息" << endl;
     cout << "   write                       # 将内存中的数据写入到文件中" << endl;
     cout << "   quit                        # 退出json文件编辑模式" << endl;
-    cout << "   set   key/index   value     # 给key设置新值, 不存在打印failed" << endl;
-    cout << "   add   type key    value     # 添加新的值，数组的话不考虑index直接将值添加到最后,type: str, num, bool, null" << endl;
+    cout << "   set   type key/index value  # 给key设置新值, 不存在打印failed" << endl;
+    cout << "   add   type key/index value  # 添加新的值，数组的话不考虑index直接将值添加到最后。" << endl;
+    cout << "                                 type: str, num, bool, null" << endl;
     cout << "   del   key/index             # 删除key/index对应的元素" << endl;
     cout << "   cd    key/index             # key是数组或是对象时，可以进入" << endl;
     cout << "   ls                          # 打印当前对象/数组中的元素, 不存在返回 \"\"" << endl;
@@ -86,8 +87,23 @@ EnumOption parse_arg(string cmd)
                 g_current_value = &g_json;
             } else if (cmd_list[0] == "quit") {
                 return EOption_Quit;
-            } else if (cmd_list[0] == "mod") {
-                // to-do
+            } else if (cmd_list[0] == "set") {
+                if (g_current_value->get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 4) {
+                    if (cmd_list[1] == "str") {
+                        (*g_current_value)[cmd_list[2]] = cmd_list[3];
+                    } else if (cmd_list[1] == "num"){
+                        double value = stod(cmd_list[3]);
+                        (*g_current_value)[cmd_list[2]] = value;
+                    }
+                } else if (g_current_value->get_type() == JSON_ARRAY_TYPE && cmd_list.size() == 3) {
+                    int index = stoi(cmd_list[1]);
+                    if (cmd_list[1] == "str") {
+                        (*g_current_value)[index] = cmd_list[2];
+                    } else if (cmd_list[1] == "num"){
+                        double value = stod(cmd_list[2]);
+                        (*g_current_value)[index] = value;
+                    }
+                }
             } else if (cmd_list[0] == "add") { // 不能添加数组和对象， 格式转换又问题
                 if (g_current_value->get_type() == JSON_OBJECT_TYPE && cmd_list.size() == 4) {
                     if (cmd_list[1] == "str") {
@@ -112,8 +128,11 @@ EnumOption parse_arg(string cmd)
                 }
             } else if (cmd_list[0] == "cd" && cmd_list.size() == 2) {
                 VALUE_TYPE val_type = g_current_value->get_type();
-                if (val_type == JSON_OBJECT_TYPE || val_type == JSON_ARRAY_TYPE) {
+                if (val_type == JSON_OBJECT_TYPE) {
                     g_current_value = &(*g_current_value)[cmd_list[1]];
+                } else if (val_type == JSON_ARRAY_TYPE) {
+                    int value = stoi(cmd_list[1]);
+                    g_current_value = &(*g_current_value)[value];
                 }
             } else if (cmd_list[0] == "ls") { // 支持打印对应key或是index指向的值
                 cout << "current_type: " << g_current_value->get_type() << endl;

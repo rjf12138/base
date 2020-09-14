@@ -209,7 +209,7 @@ public:
     bool operator==(const JsonObject& rhs) const;
     bool operator!=(const JsonObject& rhs) const;
     JsonObject& operator=(JsonObject rhs);
-    ValueTypeCast& operator[](const JsonIndex &key);
+    ValueTypeCast& operator[](const string &key);
 
 public:
     map<string, ValueTypeCast> object_val_;
@@ -278,7 +278,7 @@ public:
     bool operator==(const ValueTypeCast& rhs) const;
     bool operator!=(const ValueTypeCast& rhs) const;
 
-    ValueTypeCast operator[](const JsonIndex &key);
+    ValueTypeCast& operator[](JsonIndex key);
 
     // 解析json类型
     virtual ByteBuffer_Iterator parse(ByteBuffer_Iterator &value_start_pos, ByteBuffer_Iterator &json_end_pos);
