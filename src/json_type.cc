@@ -1257,7 +1257,6 @@ ValueTypeCast& ValueTypeCast::operator[](JsonIndex key)
         return json_object_value_[key];
     } else if (json_value_type_ == JSON_ARRAY_TYPE && 
             key.get_type() == JSON_NUMBER_TYPE) {
-                cout << "ValueTypeCast::operator[]: " << key << " size: " << json_array_value_.array_val_.size()<< endl;
         return json_array_value_[key];
     } else {
         string err_str = get_msg("Json: Out of range");

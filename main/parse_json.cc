@@ -37,15 +37,14 @@ int main(int argc, char *argv[])
 
     string input;
     while (true) {
-        cout << ">";
+        // cout << ">H";
         getline(cin, input);
         if (input == "quit") {
             break;
         }
         parse_arg(input);
     }
-    
-    cout << "edit over!" << endl; 
+
     return 0;
 }
 
@@ -62,6 +61,7 @@ void help_info(void)
     cout << "   del   key/index             # 删除key/index对应的元素" << endl;
     cout << "   cd    key/index             # key是数组或是对象时，可以进入" << endl;
     cout << "   ls                          # 打印当前对象/数组中的元素, 不存在返回 \"\"" << endl;
+    cout << "   print key                   # 打印当前json结构下 key 对应的值" << endl;
     cout << endl;
 
     return ;
@@ -99,7 +99,7 @@ EnumOption parse_arg(string cmd)
                     int index = stoi(cmd_list[1]);
                     if (cmd_list[1] == "str") {
                         (*g_current_value)[index] = cmd_list[2];
-                    } else if (cmd_list[1] == "num"){
+                    } else if (cmd_list[1] == "num") {
                         double value = stod(cmd_list[2]);
                         (*g_current_value)[index] = value;
                     }
@@ -135,7 +135,6 @@ EnumOption parse_arg(string cmd)
                     g_current_value = &(*g_current_value)[value];
                 }
             } else if (cmd_list[0] == "ls") { // 支持打印对应key或是index指向的值
-                cout << "current_type: " << g_current_value->get_type() << endl;
                 if (g_current_value->get_type() == JSON_OBJECT_TYPE || g_current_value->get_type() == JSON_ARRAY_TYPE) {
                     int arr_index = 0;
                     auto iter_begin = g_current_value->begin();
@@ -155,6 +154,13 @@ EnumOption parse_arg(string cmd)
                             cout << " -- " << iter.second() << endl;
                         }
                     }
+                }
+            } else if (cmd_list[0] == "print" && cmd_list.size() == 2) {
+                if (g_current_value->get_type() == JSON_ARRAY_TYPE) {
+                    int value = stoi(cmd_list[1]);
+                    cout << (*g_current_value)[value] << endl;
+                } else if (g_current_value->get_type() == JSON_OBJECT_TYPE) {
+                    cout << (*g_current_value)[cmd_list[1]] << endl;
                 }
             } else {
                 cerr << "Unknown option: " << cmd_list[0] << endl;

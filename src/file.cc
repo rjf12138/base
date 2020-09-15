@@ -107,14 +107,17 @@ FileOperate::check_fd(int fd)
     return 0;
 }
 
-void 
+int
 FileOperate::clear_file(void)
 {
-    ftruncate64(fd_, 0);
+    int ret = ftruncate64(fd_, 0);
+    if (ret < 0) {
+        return -1;
+    }
     // 将文件偏移量设为0，防止出现文件空洞
     this->seek(0, SEEK_SET);
 
-    return ;
+    return 0;
 }
 
 off_t 

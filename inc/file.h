@@ -29,7 +29,7 @@ public:
     // 错误打印
     void print_errno(void);
     // 清空文件
-    void clear_file(void);
+    int clear_file(void);
     
     // 设置文件偏移
     off_t seek(off_t offset, int whence);
