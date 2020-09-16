@@ -155,12 +155,23 @@ EnumOption parse_arg(string cmd)
                         }
                     }
                 }
-            } else if (cmd_list[0] == "print" && cmd_list.size() == 2) {
-                if (g_current_value->get_type() == JSON_ARRAY_TYPE) {
-                    int value = stoi(cmd_list[1]);
-                    cout << (*g_current_value)[value] << endl;
-                } else if (g_current_value->get_type() == JSON_OBJECT_TYPE) {
-                    cout << (*g_current_value)[cmd_list[1]] << endl;
+            } else if (cmd_list[0] == "print") {
+                if (cmd_list.size() == 2) {
+                    if (g_current_value->get_type() == JSON_ARRAY_TYPE) {
+                        int value = stoi(cmd_list[1]);
+                        cout << (*g_current_value)[value] << endl;
+                    } else if (g_current_value->get_type() == JSON_OBJECT_TYPE) {
+                        cout << (*g_current_value)[cmd_list[1]] << endl;
+                    }
+                } else if (cmd_list.size() == 1) {
+                    for (auto iter = (*g_current_value).begin(); iter != (*g_current_value).end(); ++iter) {
+                        if (iter.second().get_type() == JSON_ARRAY_TYPE || iter.second().get_type() == JSON_OBJECT_TYPE) {
+                            cout << "obj_or_arr" << ' ';
+                            continue;
+                        }
+                        cout << iter.second() << ' ';
+                    }
+                    cout << endl;
                 }
             } else {
                 cerr << "Unknown option: " << cmd_list[0] << endl;
